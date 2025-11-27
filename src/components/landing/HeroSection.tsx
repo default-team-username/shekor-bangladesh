@@ -27,7 +27,8 @@ export const HeroSection = () => {
         <div className="mb-6 flex flex-col gap-4 sm:flex-row">
           <Button
             size="lg"
-            className="min-w-[140px] bg-primary-foreground text-lg font-bold text-primary shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            variant="hero"
+            className="min-w-[140px] text-lg font-bold"
           >
             {language === "en" ? "Join Now" : "যোগ দিন"}
             <ChevronRight className="ml-2 h-5 w-5" />
@@ -35,9 +36,9 @@ export const HeroSection = () => {
 
           <Button
             size="lg"
-            variant="outline"
+            variant="hero"
             onClick={scrollToWorkflow}
-            className="min-w-[140px] border-2 border-primary-foreground bg-transparent text-lg font-bold text-primary-foreground shadow-lg transition-all hover:scale-105 hover:bg-primary-foreground/20 hover:text-primary-foreground"
+            className="min-w-[140px] text-lg font-bold"
           >
             {language === "en" ? "Explore" : "ঘুরে দেখুন"}
           </Button>
