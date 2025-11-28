@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,8 @@ const SignupInfographicPage = () => {
   const totalSteps = stepsData.length;
   const [showForm, setShowForm] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [activeField, setActiveField] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -106,6 +108,20 @@ const SignupInfographicPage = () => {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+
+  // Handle clicks outside the form to clear active field
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (formRef.current && !formRef.current.contains(event.target as Node)) {
+        setActiveField(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const getTranslation = (en: string, bn: string) => (language === "en" ? en : bn);
 
@@ -163,6 +179,19 @@ const SignupInfographicPage = () => {
     }
   };
 
+  // Handle Enter key press to move to next field or submit
+  const handleKeyDown = (e: React.KeyboardEvent, nextField: string | null = null) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (nextField) {
+        setActiveField(nextField);
+      } else {
+        // If no next field, submit the form
+        form.handleSubmit(onSubmit)();
+      }
+    }
+  };
+
   // --- Digital Farmer Score Card ---
   const DigitalFarmerScoreCard = () => (
     <Card className="w-full bg-harvest-yellow/10 border-harvest-yellow/50 shadow-lg">
@@ -201,7 +230,11 @@ const SignupInfographicPage = () => {
 
         <DigitalFarmerScoreCard />
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
+        <form 
+          ref={formRef}
+          onSubmit={form.handleSubmit(onSubmit)} 
+          className="mt-6 space-y-4"
+        >
           {/* NID Input - Only numbers allowed */}
           <div className="space-y-2">
             <Label htmlFor="nid" className="flex items-center gap-2 text-sm font-medium">
@@ -218,7 +251,10 @@ const SignupInfographicPage = () => {
                 const value = e.target.value.replace(/[^0-9]/g, '');
                 form.setValue('nid', value, { shouldValidate: true });
               }}
-              className="bg-muted/50"
+              onFocus={() => setActiveField('nid')}
+              onBlur={() => activeField === 'nid' && setActiveField(null)}
+              onKeyDown={(e) => handleKeyDown(e, 'name')}
+              className={`bg-muted/50 ${activeField === 'nid' ? 'ring-2 ring-primary' : ''}`}
             />
             {form.formState.errors.nid && (
               <p className="text-xs text-destructive">
@@ -238,7 +274,10 @@ const SignupInfographicPage = () => {
               placeholder={getTranslation("Enter your name", "আপনার নাম লিখুন")}
               value={form.watch('name') || ''}
               onChange={(e) => form.setValue('name', e.target.value, { shouldValidate: true })}
-              className="bg-muted/50"
+              onFocus={() => setActiveField('name')}
+              onBlur={() => activeField === 'name' && setActiveField(null)}
+              onKeyDown={(e) => handleKeyDown(e, 'mobile')}
+              className={`bg-muted/50 ${activeField === 'name' ? 'ring-2 ring-primary' : ''}`}
             />
             {form.formState.errors.name && (
               <p className="text-xs text-destructive">
@@ -263,7 +302,10 @@ const SignupInfographicPage = () => {
                 const value = e.target.value.replace(/[^0-9]/g, '');
                 form.setValue('mobile', value, { shouldValidate: true });
               }}
-              className="bg-muted/50"
+              onFocus={() => setActiveField('mobile')}
+              onBlur={() => activeField === 'mobile' && setActiveField(null)}
+              onKeyDown={(e) => handleKeyDown(e, 'district')}
+              className={`bg-muted/50 ${activeField === 'mobile' ? 'ring-2 ring-primary' : ''}`}
             />
             {form.formState.errors.mobile && (
               <p className="text-xs text-destructive">
@@ -279,10 +321,17 @@ const SignupInfographicPage = () => {
               {getTranslation("District", "জেলা")}
             </Label>
             <Select 
-              onValueChange={(value) => form.setValue('district', value, { shouldValidate: true })} 
+              onValueChange={(value) => {
+                form.setValue('district', value, { shouldValidate: true });
+                setActiveField(null);
+              }} 
               value={form.watch('district') || ''}
             >
-              <SelectTrigger className="w-full bg-muted/50">
+              <SelectTrigger 
+                className={`w-full bg-muted/50 ${activeField === 'district' ? 'ring-2 ring-primary' : ''}`}
+                onFocus={() => setActiveField('district')}
+                onBlur={() => activeField === 'district' && setActiveField(null)}
+              >
                 <SelectValue placeholder={getTranslation("Select District", "জেলা নির্বাচন করুন")} />
               </SelectTrigger>
               <SelectContent>
@@ -313,7 +362,10 @@ const SignupInfographicPage = () => {
               placeholder="2.5"
               value={form.watch('farmSize') || ''}
               onChange={(e) => form.setValue('farmSize', parseFloat(e.target.value) || 0, { shouldValidate: true })}
-              className="bg-muted/50"
+              onFocus={() => setActiveField('farmSize')}
+              onBlur={() => activeField === 'farmSize' && setActiveField(null)}
+              onKeyDown={(e) => handleKeyDown(e, 'password')}
+              className={`bg-muted/50 ${activeField === 'farmSize' ? 'ring-2 ring-primary' : ''}`}
             />
             {form.formState.errors.farmSize && (
               <p className="text-xs text-destructive">
@@ -334,7 +386,10 @@ const SignupInfographicPage = () => {
               placeholder={getTranslation("Minimum 6 characters", "কমপক্ষে ৬ অক্ষর")}
               value={form.watch('password') || ''}
               onChange={(e) => form.setValue('password', e.target.value, { shouldValidate: true })}
-              className="bg-muted/50"
+              onFocus={() => setActiveField('password')}
+              onBlur={() => activeField === 'password' && setActiveField(null)}
+              onKeyDown={(e) => handleKeyDown(e)}
+              className={`bg-muted/50 ${activeField === 'password' ? 'ring-2 ring-primary' : ''}`}
             />
             {form.formState.errors.password && (
               <p className="text-xs text-destructive">
