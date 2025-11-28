@@ -1,50 +1,60 @@
-# AI Development Rules for HarvestGuard
+<!--
 
-This document outlines the technical stack and specific rules for developing and modifying the HarvestGuard application.
+System Guidelines
 
-## Tech Stack Overview
+Use this file to provide the AI with rules and guidelines you want it to follow.
+This template outlines a few examples of things you can add. You can add your own sections and format it to suit your needs
 
-1.  **Framework:** React (TypeScript).
-2.  **Build Tool:** Vite.
-3.  **Styling:** Tailwind CSS, prioritizing responsive design and utility classes.
-4.  **UI Library:** shadcn/ui (built on Radix UI).
-5.  **Routing:** React Router DOM.
-6.  **Data Management:** TanStack Query (React Query) for server state management.
-7.  **Forms & Validation:** React Hook Form paired with Zod.
-8.  **Icons:** Lucide React.
-9.  **Notifications:** Sonner for modern toast notifications.
-10. **Internationalization (i18n):** Custom context-based system supporting English (en) and Bengali (bn).
+TIP: More context isn't always better. It can confuse the LLM. Try and add the most important rules you need
 
-## Development Guidelines and Library Usage
+# General guidelines
 
-### 1. Component Structure
-*   **Location:** Components must be placed in `src/components/` and pages in `src/pages/`.
-*   **Size:** Aim for small, focused components (ideally under 100 lines). Create a new file for every new component or hook.
-*   **Shadcn/ui:** Use pre-built shadcn/ui components. Do not modify the files in `src/components/ui/`. If customization is needed, create a new component that wraps or extends the base UI component.
+Any general rules you want the AI to follow.
+For example:
 
-### 2. Styling and Design
-*   **CSS:** All styling must be done using Tailwind CSS utility classes.
-*   **Responsiveness:** All designs must be responsive by default.
-*   **Theming:** The application supports light and dark modes (defined in `src/index.css`). Ensure new components respect these themes.
-*   **Custom Colors:** Utilize the custom `harvest` color palette defined in `tailwind.config.ts` and `src/index.css`.
+* Only use absolute positioning when necessary. Opt for responsive and well structured layouts that use flexbox and grid by default
+* Refactor code as you go to keep code clean
+* Keep file sizes small and put helper functions and components in their own files.
 
-### 3. Routing and Navigation
-*   **Library:** Use `react-router-dom`.
-*   **Route Definition:** All primary routes must be defined within `src/App.tsx`.
+--------------
 
-### 4. Data and State
-*   **Server State:** Use `@tanstack/react-query` for fetching, caching, and updating server data.
-*   **Local State:** Use standard React `useState` and `useReducer`.
+# Design system guidelines
+Rules for how the AI should make generations look like your company's design system
 
-### 5. Forms
-*   **Implementation:** Use `react-hook-form` for managing form state and submission.
-*   **Validation:** Use `zod` for defining form schemas and validation rules.
+Additionally, if you select a design system to use in the prompt box, you can reference
+your design system's components, tokens, variables and components.
+For example:
 
-### 6. Internationalization (i18n)
-*   **Mandatory:** All user-facing text must be translated into both English (`en`) and Bengali (`bn`) using the `useLanguage` hook from `src/contexts/LanguageContext.tsx`.
+* Use a base font-size of 14px
+* Date formats should always be in the format “Jun 10”
+* The bottom toolbar should only ever have a maximum of 4 items
+* Never use the floating action button with the bottom toolbar
+* Chips should always come in sets of 3 or more
+* Don't use a dropdown if there are 2 or fewer options
 
-### 7. Notifications
-*   **Toasts:** Use the `Sonner` component (imported as `Sonner` in `src/App.tsx`) for displaying non-intrusive notifications.
+You can also create sub sections and add more specific details
+For example:
 
-### 8. Assets
-*   **Icons:** Use icons exclusively from `lucide-react`.
+
+## Button
+The Button component is a fundamental interactive element in our design system, designed to trigger actions or navigate
+users through the application. It provides visual feedback and clear affordances to enhance user experience.
+
+### Usage
+Buttons should be used for important actions that users need to take, such as form submissions, confirming choices,
+or initiating processes. They communicate interactivity and should have clear, action-oriented labels.
+
+### Variants
+* Primary Button
+  * Purpose : Used for the main action in a section or page
+  * Visual Style : Bold, filled with the primary brand color
+  * Usage : One primary button per section to guide users toward the most important action
+* Secondary Button
+  * Purpose : Used for alternative or supporting actions
+  * Visual Style : Outlined with the primary color, transparent background
+  * Usage : Can appear alongside a primary button for less important actions
+* Tertiary Button
+  * Purpose : Used for the least important actions
+  * Visual Style : Text-only with no border, using primary color
+  * Usage : For actions that should be available but not emphasized
+-->
