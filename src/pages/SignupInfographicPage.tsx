@@ -83,21 +83,33 @@ const SignupInfographicPage = () => {
     },
   });
 
-  // Watch form fields to calculate progress
-  const formData = form.watch();
+  // Function to calculate and set progress based on current form values
+  const calculateProgress = () => {
+    const values = form.getValues();
+    const fields = Object.values(values);
+    
+    const filledFields = fields.filter(field => {
+        if (typeof field === 'string') {
+            return field.trim() !== '';
+        }
+        // Check for farmSize specifically
+        if (typeof field === 'number') {
+            return field > 0;
+        }
+        return field !== undefined && field !== null;
+    }).length;
+    
+    const totalFields = fields.length;
+    const newProgress = Math.round((filledFields / totalFields) * 100);
+    setProgress(newProgress);
+  };
   
+  // Initial progress calculation when form is shown
   useEffect(() => {
     if (showForm) {
-      // Calculate progress based on filled fields
-      const fields = Object.values(formData);
-      const filledFields = fields.filter(field => 
-        field !== '' && field !== 0 && field !== undefined
-      ).length;
-      const totalFields = fields.length;
-      const newProgress = Math.round((filledFields / totalFields) * 100);
-      setProgress(newProgress);
+      calculateProgress();
     }
-  }, [formData, showForm]);
+  }, [showForm]);
 
   React.useEffect(() => {
     if (!api) return;
@@ -183,6 +195,7 @@ const SignupInfographicPage = () => {
   const handleKeyDown = (e: React.KeyboardEvent, nextField: string | null = null) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      calculateProgress(); // <-- Update progress on Enter
       if (nextField) {
         setActiveField(nextField);
       } else {
@@ -252,7 +265,7 @@ const SignupInfographicPage = () => {
                 form.setValue('nid', value, { shouldValidate: true });
               }}
               onFocus={() => setActiveField('nid')}
-              onBlur={() => activeField === 'nid' && setActiveField(null)}
+              onBlur={() => { setActiveField(null); calculateProgress(); }}
               onKeyDown={(e) => handleKeyDown(e, 'name')}
               className={`bg-muted/50 ${activeField === 'nid' ? 'ring-2 ring-primary' : ''}`}
             />
@@ -275,7 +288,7 @@ const SignupInfographicPage = () => {
               value={form.watch('name') || ''}
               onChange={(e) => form.setValue('name', e.target.value, { shouldValidate: true })}
               onFocus={() => setActiveField('name')}
-              onBlur={() => activeField === 'name' && setActiveField(null)}
+              onBlur={() => { setActiveField(null); calculateProgress(); }}
               onKeyDown={(e) => handleKeyDown(e, 'mobile')}
               className={`bg-muted/50 ${activeField === 'name' ? 'ring-2 ring-primary' : ''}`}
             />
@@ -303,7 +316,7 @@ const SignupInfographicPage = () => {
                 form.setValue('mobile', value, { shouldValidate: true });
               }}
               onFocus={() => setActiveField('mobile')}
-              onBlur={() => activeField === 'mobile' && setActiveField(null)}
+              onBlur={() => { setActiveField(null); calculateProgress(); }}
               onKeyDown={(e) => handleKeyDown(e, 'district')}
               className={`bg-muted/50 ${activeField === 'mobile' ? 'ring-2 ring-primary' : ''}`}
             />
@@ -324,13 +337,14 @@ const SignupInfographicPage = () => {
               onValueChange={(value) => {
                 form.setValue('district', value, { shouldValidate: true });
                 setActiveField(null);
+                calculateProgress(); // <-- Update progress immediately on selection
               }} 
               value={form.watch('district') || ''}
             >
               <SelectTrigger 
                 className={`w-full bg-muted/50 ${activeField === 'district' ? 'ring-2 ring-primary' : ''}`}
                 onFocus={() => setActiveField('district')}
-                onBlur={() => activeField === 'district' && setActiveField(null)}
+                onBlur={() => { setActiveField(null); calculateProgress(); }}
               >
                 <SelectValue placeholder={getTranslation("Select District", "জেলা নির্বাচন করুন")} />
               </SelectTrigger>
@@ -363,7 +377,7 @@ const SignupInfographicPage = () => {
               value={form.watch('farmSize') || ''}
               onChange={(e) => form.setValue('farmSize', parseFloat(e.target.value) || 0, { shouldValidate: true })}
               onFocus={() => setActiveField('farmSize')}
-              onBlur={() => activeField === 'farmSize' && setActiveField(null)}
+              onBlur={() => { setActiveField(null); calculateProgress(); }}
               onKeyDown={(e) => handleKeyDown(e, 'password')}
               className={`bg-muted/50 ${activeField === 'farmSize' ? 'ring-2 ring-primary' : ''}`}
             />
@@ -387,7 +401,7 @@ const SignupInfographicPage = () => {
               value={form.watch('password') || ''}
               onChange={(e) => form.setValue('password', e.target.value, { shouldValidate: true })}
               onFocus={() => setActiveField('password')}
-              onBlur={() => activeField === 'password' && setActiveField(null)}
+              onBlur={() => { setActiveField(null); calculateProgress(); }}
               onKeyDown={(e) => handleKeyDown(e)}
               className={`bg-muted/50 ${activeField === 'password' ? 'ring-2 ring-primary' : ''}`}
             />
