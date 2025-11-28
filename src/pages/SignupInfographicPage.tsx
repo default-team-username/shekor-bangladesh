@@ -202,7 +202,7 @@ const SignupInfographicPage = () => {
         <DigitalFarmerScoreCard />
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
-          {/* NID Input */}
+          {/* NID Input - Only numbers allowed */}
           <div className="space-y-2">
             <Label htmlFor="nid" className="flex items-center gap-2 text-sm font-medium">
               <CreditCard className="h-4 w-4 text-primary" />
@@ -210,9 +210,14 @@ const SignupInfographicPage = () => {
             </Label>
             <Input
               id="nid"
+              type="text"
+              inputMode="numeric"
               placeholder={getTranslation("1234567890", "১২৩৪৫৬৭৮৯০")}
               {...form.register('nid')}
               className="bg-muted/50"
+              onInput={(e) => {
+                e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+              }}
             />
             {form.formState.errors.nid && (
               <p className="text-xs text-destructive">
@@ -240,7 +245,7 @@ const SignupInfographicPage = () => {
             )}
           </div>
 
-          {/* Mobile Number Input */}
+          {/* Mobile Number Input - Only numbers allowed */}
           <div className="space-y-2">
             <Label htmlFor="mobile" className="flex items-center gap-2 text-sm font-medium">
               <Smartphone className="h-4 w-4 text-primary" />
@@ -248,9 +253,14 @@ const SignupInfographicPage = () => {
             </Label>
             <Input
               id="mobile"
+              type="text"
+              inputMode="numeric"
               placeholder={getTranslation("01712345678", "০১৭১২৩৪৫৬৭৮")}
               {...form.register('mobile')}
               className="bg-muted/50"
+              onInput={(e) => {
+                e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+              }}
             />
             {form.formState.errors.mobile && (
               <p className="text-xs text-destructive">
