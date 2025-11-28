@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Sprout } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const { language, toggleLanguage } = useLanguage();
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 bg-primary shadow-md">
@@ -19,6 +21,7 @@ export const Header = () => {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => navigate('/login')}
             className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           >
             {language === "en" ? "Login" : "লগইন"}
