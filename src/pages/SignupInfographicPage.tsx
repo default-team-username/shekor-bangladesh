@@ -21,8 +21,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 // --- Schema Definition ---
 const signupSchema = z.object({
-  nid: z.string().min(10, { message: "NID must be at least 10 digits." }),
-  mobile: z.string().min(10, { message: "Mobile number must be at least 10 digits." }),
+  nid: z.string()
+    .min(10, { message: "NID must be at least 10 digits." })
+    .regex(/^\d+$/, { message: "NID must contain only numbers." }),
+  mobile: z.string()
+    .min(10, { message: "Mobile number must be at least 10 digits." })
+    .regex(/^\d+$/, { message: "Mobile number must contain only numbers." }),
   name: z.string().min(2, { message: "Name is required." }),
   district: z.string().min(1, { message: "Please select a district." }),
   farmSize: z.number().min(0.1, { message: "Farm size must be greater than 0." }),
@@ -78,7 +82,12 @@ const SignupInfographicPage = () => {
       farmSize: 0,
       password: '',
     },
+    mode: 'onChange', // Enable validation on change for score calculation
   });
+
+  const { formState } = form;
+  const isFormValid = formState.isValid;
+  const digitalScore = isFormValid ? 100 : 0;
 
   React.useEffect(() => {
     if (!api) return;
@@ -113,7 +122,7 @@ const SignupInfographicPage = () => {
   const isFirstStep = current === 0;
 
   const onSubmit = async (data: SignupFormValues) => {
-    const { mobile, password, name, district } = data;
+    const { mobile, password, name, district, nid, farmSize } = data;
     
     // Supabase uses email/password. We map mobile number to a dummy email for demonstration.
     const email = `${mobile}@harvestguard.com`; 
@@ -121,15 +130,19 @@ const SignupInfographicPage = () => {
     const loadingToastId = toast.loading(getTranslation('Registering...', 'নিবন্ধন হচ্ছে...'));
 
     try {
-      // We pass the name and role ('farmer') in the user_metadata to be picked up by the handle_new_user trigger
+      // We pass the name, role, NID, mobile, district, and farm_size in the user_metadata 
+      // to be picked up by the handle_new_farmer trigger (which we will assume exists or create later)
       const { data: { user }, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            first_name: name,
+            name: name,
             role: 'farmer', // Assuming all signups here are farmers
             district: district,
+            nid: nid,
+            mobile: mobile,
+            farm_size: farmSize,
           }
         }
       });
@@ -159,8 +172,8 @@ const SignupInfographicPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="text-lg font-bold text-harvest-dark">
-            0/100
+          <div className={`text-lg font-bold ${digitalScore === 100 ? 'text-primary' : 'text-harvest-dark'}`}>
+            {digitalScore}/100
           </div>
           <Ruler className="h-5 w-5 text-harvest-yellow" />
         </div>
@@ -195,6 +208,8 @@ const SignupInfographicPage = () => {
               placeholder={getTranslation("1234567890", "১২৩৪৫৬৭৮৯০")}
               {...form.register('nid')}
               className="bg-muted/50"
+              inputMode="numeric"
+              pattern="[0-9]*"
             />
             {form.formState.errors.nid && (
               <p className="text-xs text-destructive">
@@ -233,6 +248,8 @@ const SignupInfographicPage = () => {
               placeholder={getTranslation("01712345678", "০১৭১২৩৪৫৬৭৮")}
               {...form.register('mobile')}
               className="bg-muted/50"
+              inputMode="numeric"
+              pattern="[0-9]*"
             />
             {form.formState.errors.mobile && (
               <p className="text-xs text-destructive">
@@ -308,7 +325,7 @@ const SignupInfographicPage = () => {
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full text-lg font-semibold h-12 mt-6">
+          <Button type="submit" className="w-full text-lg font-semibold h-12 mt-6" disabled={!isFormValid}>
             {getTranslation("Complete Registration", "নিবন্ধন সম্পন্ন করুন")}
           </Button>
         </form>
@@ -408,6 +425,7 @@ const SignupInfographicPage = () => {
               onClick={showForm ? form.handleSubmit(onSubmit) : handleNext}
               className="flex-1 bg-white text-primary hover:bg-gray-100"
               type={showForm ? "submit" : "button"}
+              disabled={showForm && !isFormValid}
             >
               {showForm
                 ? getTranslation("Complete Registration", "নিবন্ধন সম্পন্ন করুন")

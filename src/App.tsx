@@ -9,7 +9,7 @@ import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
 import SignupInfographicPage from "./pages/SignupInfographicPage";
 import NotFound from "./pages/NotFound";
-import Dashboard from "./pages/Dashboard"; // Placeholder for dashboard
+import FarmerDashboard from "./pages/FarmerDashboard"; // Import the renamed dashboard
 
 const queryClient = new QueryClient();
 
@@ -25,7 +25,7 @@ const App = () => (
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupInfographicPage />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<FarmerDashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
