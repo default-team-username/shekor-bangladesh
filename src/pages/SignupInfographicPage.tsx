@@ -213,11 +213,12 @@ const SignupInfographicPage = () => {
               type="text"
               inputMode="numeric"
               placeholder={getTranslation("1234567890", "১২৩৪৫৬৭৮৯০")}
-              {...form.register('nid')}
-              className="bg-muted/50"
-              onInput={(e) => {
-                e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+              value={form.watch('nid') || ''}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                form.setValue('nid', value, { shouldValidate: true });
               }}
+              className="bg-muted/50"
             />
             {form.formState.errors.nid && (
               <p className="text-xs text-destructive">
@@ -235,7 +236,8 @@ const SignupInfographicPage = () => {
             <Input
               id="name"
               placeholder={getTranslation("Enter your name", "আপনার নাম লিখুন")}
-              {...form.register('name')}
+              value={form.watch('name') || ''}
+              onChange={(e) => form.setValue('name', e.target.value, { shouldValidate: true })}
               className="bg-muted/50"
             />
             {form.formState.errors.name && (
@@ -256,11 +258,12 @@ const SignupInfographicPage = () => {
               type="text"
               inputMode="numeric"
               placeholder={getTranslation("01712345678", "০১৭১২৩৪৫৬৭৮")}
-              {...form.register('mobile')}
-              className="bg-muted/50"
-              onInput={(e) => {
-                e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+              value={form.watch('mobile') || ''}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                form.setValue('mobile', value, { shouldValidate: true });
               }}
+              className="bg-muted/50"
             />
             {form.formState.errors.mobile && (
               <p className="text-xs text-destructive">
@@ -275,7 +278,10 @@ const SignupInfographicPage = () => {
               <MapPin className="h-4 w-4 text-primary" />
               {getTranslation("District", "জেলা")}
             </Label>
-            <Select onValueChange={(value) => form.setValue('district', value, { shouldValidate: true })} value={form.watch('district')}>
+            <Select 
+              onValueChange={(value) => form.setValue('district', value, { shouldValidate: true })} 
+              value={form.watch('district') || ''}
+            >
               <SelectTrigger className="w-full bg-muted/50">
                 <SelectValue placeholder={getTranslation("Select District", "জেলা নির্বাচন করুন")} />
               </SelectTrigger>
@@ -305,7 +311,8 @@ const SignupInfographicPage = () => {
               type="number"
               step="0.1"
               placeholder="2.5"
-              {...form.register('farmSize', { valueAsNumber: true })}
+              value={form.watch('farmSize') || ''}
+              onChange={(e) => form.setValue('farmSize', parseFloat(e.target.value) || 0, { shouldValidate: true })}
               className="bg-muted/50"
             />
             {form.formState.errors.farmSize && (
@@ -325,7 +332,8 @@ const SignupInfographicPage = () => {
               id="password"
               type="password"
               placeholder={getTranslation("Minimum 6 characters", "কমপক্ষে ৬ অক্ষর")}
-              {...form.register('password')}
+              value={form.watch('password') || ''}
+              onChange={(e) => form.setValue('password', e.target.value, { shouldValidate: true })}
               className="bg-muted/50"
             />
             {form.formState.errors.password && (
