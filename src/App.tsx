@@ -12,6 +12,7 @@ import SignupInfographicPage from "./pages/SignupInfographicPage";
 import NotFound from "./pages/NotFound";
 import FarmerDashboard from "./pages/FarmerDashboard";
 import BatchRegistrationPage from "./pages/BatchRegistrationPage"; // Import new page
+import BatchDetailsPage from "./pages/BatchDetailsPage"; // Import new page
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
                 <Route path="/signup" element={<SignupInfographicPage />} />
                 <Route path="/dashboard" element={<FarmerDashboard />} />
                 <Route path="/dashboard/new-batch" element={<BatchRegistrationPage />} /> {/* New Route */}
+                <Route path="/dashboard/batch/:id" element={<BatchDetailsPage />} /> {/* New Route for details */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

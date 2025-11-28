@@ -6,7 +6,7 @@ import { Bell, Plus, Wheat, AlertTriangle, Ruler, LogOut } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useBatch } from '@/contexts/BatchContext';
+import { useBatch, StoredBatch } from '@/contexts/BatchContext';
 import { format } from 'date-fns';
 
 const FarmerDashboard = () => {
@@ -65,7 +65,13 @@ const FarmerDashboard = () => {
     </Card>
   );
 
-  const BatchListItem = ({ batch }: { batch: typeof batches[0] }) => {
+  const BatchListItem = ({ batch }: { batch: StoredBatch }) => {
+    const navigate = useNavigate();
+    
+    const handleClick = () => {
+      navigate(`/dashboard/batch/${batch.id}`);
+    };
+
     const riskLevel = batch.prediction.riskLevel;
     let riskColorClass = 'text-primary';
     let riskTextEn = 'Low Risk';
@@ -85,7 +91,10 @@ const FarmerDashboard = () => {
     const cropTypeDisplay = batch.data.cropType.charAt(0).toUpperCase() + batch.data.cropType.slice(1);
 
     return (
-      <Card className="p-4 shadow-md border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer rounded-xl">
+      <Card 
+        className="p-4 shadow-md border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer rounded-xl"
+        onClick={handleClick} // Added onClick handler
+      >
         <CardContent className="p-0 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className={cn("h-10 w-10 flex items-center justify-center rounded-full", riskLevel === 'High' ? 'bg-destructive/10' : 'bg-primary/10')}>
@@ -136,8 +145,8 @@ const FarmerDashboard = () => {
         <h3 className="text-lg font-semibold text-foreground">
           {getTranslation("Active Batches", "সক্রিয় ব্যাচসমূহ")}
         </h3>
-        {batches.map((batch, index) => (
-          <BatchListItem key={index} batch={batch} />
+        {batches.map((batch) => (
+          <BatchListItem key={batch.id} batch={batch} />
         ))}
       </div>
     );

@@ -46,18 +46,10 @@ const BatchRegistrationPage = () => {
 
     const result = generateMockPrediction(data);
     
-    // Save the batch and navigate (Requirement 3)
-    if (result) {
-      addBatch(data, result);
-      
-      toast.success(getTranslation('New batch successfully added!', 'নতুন ব্যাচ সফলভাবে যোগ হয়েছে!'), { id: loadingToastId });
-      
-      // Navigate back to dashboard after successful submission
-      navigate('/dashboard');
-      return;
-    }
-
-    // Fallback for showing result card (if flow changes)
+    // Save the batch immediately upon prediction generation
+    addBatch(data, result);
+    
+    // Set state to display the prediction card (ETCL)
     setPrediction(result);
     setSubmittedData(data);
     
