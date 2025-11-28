@@ -109,10 +109,8 @@ const FarmerDashboard = () => {
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="container mx-auto px-4 -mt-4 w-full max-w-md">
-          
-          {/* Add New Batch Button */}
+        {/* Add New Batch Button Container (Pulled up) */}
+        <div className="container mx-auto px-4 -mt-6 w-full max-w-md z-10">
           <Button className="w-full h-12 bg-primary text-white shadow-xl hover:bg-primary/90 flex items-center justify-center gap-2 rounded-lg font-semibold">
             <Plus className="h-5 w-5" />
             <div className="flex flex-col items-start">
@@ -120,7 +118,11 @@ const FarmerDashboard = () => {
               <span className="text-xs font-normal opacity-80">{getTranslation("Start monitoring your crops", "আপনার ফসল পর্যবেক্ষণ শুরু করুন")}</span>
             </div>
           </Button>
+        </div>
 
+        {/* Main Content Area (Pushed down by button height + margin) */}
+        <div className="container mx-auto px-4 mt-6 w-full max-w-md">
+          
           {/* Batch List / Empty State Card */}
           <Card className="mt-6 p-8 text-center shadow-lg border-border/50">
             <CardContent className="p-0 flex flex-col items-center justify-center h-48">
