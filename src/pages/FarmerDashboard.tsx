@@ -5,10 +5,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Bell, Plus, Wheat, AlertTriangle, Ruler, LogOut } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const FarmerDashboard = () => {
   const { user, isLoading, mockLogout } = useSession();
   const { language } = useLanguage();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
@@ -21,13 +23,16 @@ const FarmerDashboard = () => {
   const handleLogout = () => {
     mockLogout();
   };
+  
+  const handleAddNewBatch = () => {
+    navigate('/dashboard/new-batch');
+  };
 
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
   // --- Dashboard Components ---
 
   const StatCard = ({ titleEn, titleBn, value, icon: Icon, className }: { titleEn: string, titleBn: string, value: string, icon: React.ElementType, className?: string }) => (
-    // Applying styles closer to the specification: white/10 background, white/20 border, rounded-2xl
     <Card className={cn("flex flex-col justify-between p-4 bg-white/10 border border-white/20 backdrop-blur-sm", className)}>
       <div className="opacity-90">
         <p className="text-xs font-normal text-white text-center">
@@ -90,21 +95,21 @@ const FarmerDashboard = () => {
                 titleBn="মোট ব্যাচ" 
                 value="0" 
                 icon={Wheat} 
-                className="rounded-2xl" // Updated radius
+                className="rounded-2xl"
               />
               <StatCard 
                 titleEn="High Risk" 
                 titleBn="উচ্চ ঝুঁকি" 
                 value="0" 
                 icon={AlertTriangle} 
-                className="rounded-2xl" // Updated radius
+                className="rounded-2xl"
               />
               <StatCard 
                 titleEn="Score" 
                 titleBn="স্কোর" 
                 value="100" 
                 icon={Ruler} 
-                className="rounded-2xl" // Updated radius
+                className="rounded-2xl"
               />
             </div>
           </div>
@@ -112,7 +117,10 @@ const FarmerDashboard = () => {
 
         {/* Add New Batch Button Container (Pulled up) */}
         <div className="container mx-auto px-4 -mt-6 w-full max-w-md z-10">
-          <Button className="w-full h-12 bg-primary text-white shadow-xl hover:bg-primary/90 flex items-center justify-center gap-2 rounded-lg font-semibold">
+          <Button 
+            onClick={handleAddNewBatch} // Added onClick handler
+            className="w-full h-12 bg-primary text-white shadow-xl hover:bg-primary/90 flex items-center justify-center gap-2 rounded-lg font-semibold"
+          >
             <Plus className="h-5 w-5" />
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium">{getTranslation("Add New Batch", "নতুন ব্যাচ যোগ করুন")}</span>
