@@ -82,7 +82,7 @@ const SignupInfographicPage = () => {
       farmSize: 0,
       password: '',
     },
-    mode: 'onChange', // Enable validation on change for score calculation
+    mode: 'onBlur', // Changed validation mode to 'onBlur'
   });
 
   const { formState } = form;
