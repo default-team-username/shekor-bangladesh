@@ -1,8 +1,44 @@
-# Welcome to your Lovable project
+# শেকড় (Shekor) - Protecting Food, Protecting Lives
 
-## Project info
+## Project Overview: Reducing Food Loss in Bangladesh (SDG 12.3)
+
+Shekor is a mobile-first application designed to combat the significant post-harvest food loss experienced in Bangladesh, particularly concerning staple crops and grains. By leveraging technology, we aim to provide farmers with timely, hyper-local risk predictions and actionable guidance to protect their harvest and secure their livelihoods.
+
+### The Problem
+
+Bangladesh loses approximately **4.5 million metric tonnes** of food grains annually, resulting in an economic cost of around **US $1.5 billion**. Inefficiencies, poor storage, and inadequate handling lead to 12–32% loss rates for staple foods. This challenge directly hinders progress toward **Sustainable Development Goal (SDG) 12.3** (reducing food losses along production and supply chains).
+
+### The Solution
+
+Shekor provides an AI-powered crop management system that monitors storage conditions and predicts the Estimated Time to Critical Loss (ETCL), allowing farmers to intervene before spoilage occurs.
+
+### Key Features Implemented (Part A - Pre-Hackathon)
+
+1.  **Storytelling Landing Page (A1):** A bilingual (English/Bangla) landing page that highlights the food loss problem and visually demonstrates the solution workflow (Data → Warning → Action → Saved Food).
+2.  **Farmer & Crop Management (A2):**
+    *   Farmer registration and mock login system.
+    *   Registration of new crop batches, including crop type, weight, harvest date, and storage details.
+    *   A dashboard displaying active batches and a farmer score.
+    *   A celebratory modal for the first batch registration.
+3.  **Prediction & Risk Forecasting (A4 - Mock):** A simple logic model calculates the Estimated Time to Critical Loss (ETCL) based on input parameters (temperature, moisture) and provides human-readable guidance.
+
+---
+
+## Project Info
 
 **URL**: https://lovable.dev/projects/e10df1f6-e5ad-4146-a52c-3924c8e8b088
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+- React Router (for navigation)
+- Context API (for state management)
 
 ## How can I edit this code?
 
@@ -49,16 +85,6 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
 ## How can I deploy this project?
 
