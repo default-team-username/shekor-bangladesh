@@ -27,9 +27,10 @@ const FarmerDashboard = () => {
   // --- Dashboard Components ---
 
   const StatCard = ({ titleEn, titleBn, value, icon: Icon, className }: { titleEn: string, titleBn: string, value: string, icon: React.ElementType, className?: string }) => (
-    <Card className={cn("flex flex-col justify-between p-3 bg-white/10 border-white/20 backdrop-blur-sm", className)}>
+    // Applying styles closer to the specification: white/10 background, white/20 border, rounded-2xl
+    <Card className={cn("flex flex-col justify-between p-4 bg-white/10 border border-white/20 backdrop-blur-sm", className)}>
       <div className="opacity-90">
-        <p className="text-xs font-medium text-white">
+        <p className="text-xs font-normal text-white text-center">
           {getTranslation(titleEn, titleBn)}
         </p>
       </div>
@@ -89,21 +90,21 @@ const FarmerDashboard = () => {
                 titleBn="মোট ব্যাচ" 
                 value="0" 
                 icon={Wheat} 
-                className="rounded-xl"
+                className="rounded-2xl" // Updated radius
               />
               <StatCard 
                 titleEn="High Risk" 
                 titleBn="উচ্চ ঝুঁকি" 
                 value="0" 
                 icon={AlertTriangle} 
-                className="rounded-xl"
+                className="rounded-2xl" // Updated radius
               />
               <StatCard 
                 titleEn="Score" 
                 titleBn="স্কোর" 
                 value="100" 
                 icon={Ruler} 
-                className="rounded-xl"
+                className="rounded-2xl" // Updated radius
               />
             </div>
           </div>
@@ -124,7 +125,7 @@ const FarmerDashboard = () => {
         <div className="container mx-auto px-4 mt-6 w-full max-w-md">
           
           {/* Batch List / Empty State Card */}
-          <Card className="mt-6 p-8 text-center shadow-lg border-border/50">
+          <Card className="mt-6 p-8 text-center shadow-lg border-border/50 rounded-2xl">
             <CardContent className="p-0 flex flex-col items-center justify-center h-48">
               <div className="text-4xl mb-4">🌾</div>
               <h3 className="text-lg font-semibold text-muted-foreground">
