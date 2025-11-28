@@ -38,14 +38,13 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       setUser(session?.user ?? null);
       setIsLoading(false);
       
-      // Initial redirect logic
-      if (session && window.location.pathname === '/login') {
+      // Initial redirect logic - only redirect if we're on a protected page
+      // Allow access to public pages like '/' and '/signup'
+      if (session && (window.location.pathname === '/login' || window.location.pathname === '/signup')) {
         navigate('/dashboard');
-      } else if (!session && window.location.pathname !== '/login') {
-        // If we are not on the landing page, redirect to login
-        if (window.location.pathname !== '/') {
-            navigate('/login');
-        }
+      } else if (!session && window.location.pathname !== '/login' && window.location.pathname !== '/' && window.location.pathname !== '/signup') {
+        // Redirect to login for protected pages only
+        navigate('/login');
       }
     });
 
