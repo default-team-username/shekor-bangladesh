@@ -1,8 +1,4 @@
 import { useLanguage } from "@/contexts/LanguageContext";
-import workflowStep1 from "@/assets/workflow-step-1.jpg";
-import workflowStep2 from "@/assets/workflow-step-2.jpg";
-import workflowStep3 from "@/assets/workflow-step-3.jpg";
-import workflowStep4 from "@/assets/workflow-step-4.jpg";
 import {
   Carousel,
   CarouselContent,
@@ -15,30 +11,31 @@ import Autoplay from "embla-carousel-autoplay";
 export const WorkflowSection = () => {
   const { language } = useLanguage();
 
+  // Placeholder data since images were removed, keeping structure for now
   const steps = [
     {
-      image: workflowStep1,
+      image: "/placeholder.svg",
       titleEn: "Farmer Collects Data",
       titleBn: "কৃষক তথ্য সংগ্রহ করেন",
       descEn: "Using mobile app to record crop and storage conditions",
       descBn: "মোবাইল অ্যাপ ব্যবহার করে ফসল ও সংরক্ষণের তথ্য রেকর্ড করেন",
     },
     {
-      image: workflowStep2,
+      image: "/placeholder.svg",
       titleEn: "AI Risk Detection",
       titleBn: "এআই ঝুঁকি শনাক্তকরণ",
       descEn: "System analyzes weather patterns and moisture levels",
       descBn: "সিস্টেম আবহাওয়ার ধরন এবং আর্দ্রতার মাত্রা বিশ্লেষণ করে",
     },
     {
-      image: workflowStep3,
+      image: "/placeholder.svg",
       titleEn: "Warning Alert Sent",
       titleBn: "সতর্কতা সংকেত পাঠানো",
       descEn: "Instant notifications about potential food loss risks",
       descBn: "সম্ভাব্য খাদ্য ক্ষতির ঝুঁকি সম্পর্কে তাৎক্ষণিক বিজ্ঞপ্তি",
     },
     {
-      image: workflowStep4,
+      image: "/placeholder.svg",
       titleEn: "Crops Saved!",
       titleBn: "ফসল রক্ষা পেয়েছে!",
       descEn: "Timely action prevents losses and protects livelihoods",
