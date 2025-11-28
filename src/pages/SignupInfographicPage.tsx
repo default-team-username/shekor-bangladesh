@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -67,6 +67,7 @@ const SignupInfographicPage = () => {
   const [current, setCurrent] = useState(0);
   const totalSteps = stepsData.length;
   const [showForm, setShowForm] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -79,6 +80,22 @@ const SignupInfographicPage = () => {
       password: '',
     },
   });
+
+  // Watch form fields to calculate progress
+  const formData = form.watch();
+  
+  useEffect(() => {
+    if (showForm) {
+      // Calculate progress based on filled fields
+      const fields = Object.values(formData);
+      const filledFields = fields.filter(field => 
+        field !== '' && field !== 0 && field !== undefined
+      ).length;
+      const totalFields = fields.length;
+      const newProgress = Math.round((filledFields / totalFields) * 100);
+      setProgress(newProgress);
+    }
+  }, [formData, showForm]);
 
   React.useEffect(() => {
     if (!api) return;
@@ -149,21 +166,22 @@ const SignupInfographicPage = () => {
   // --- Digital Farmer Score Card ---
   const DigitalFarmerScoreCard = () => (
     <Card className="w-full bg-harvest-yellow/10 border-harvest-yellow/50 shadow-lg">
-      <CardContent className="p-4 flex justify-between items-center">
-        <div className="flex flex-col">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center mb-2">
           <p className="text-sm font-semibold text-harvest-dark">
             {getTranslation("Digital Farmer Score", "ডিজিটাল কৃষক স্কোর")}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {getTranslation("Registration Progress", "নিবন্ধনের অগ্রগতি")}
-          </p>
+          <span className="text-sm font-bold text-harvest-dark">{progress}%</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="text-lg font-bold text-harvest-dark">
-            0/100
-          </div>
-          <Ruler className="h-5 w-5 text-harvest-yellow" />
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div 
+            className="bg-harvest-yellow h-2.5 rounded-full transition-all duration-500 ease-in-out" 
+            style={{ width: `${progress}%` }}
+          ></div>
         </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          {getTranslation("Complete your profile to unlock benefits", "সুবিধাগুলি আনলক করতে আপনার প্রোফাইল সম্পূর্ণ করুন")}
+        </p>
       </CardContent>
     </Card>
   );
