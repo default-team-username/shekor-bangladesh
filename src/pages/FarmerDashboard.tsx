@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useBatch, StoredBatch } from '@/contexts/BatchContext';
 import { format } from 'date-fns';
+import { cropTypes } from '@/data/batchData';
 
 const FarmerDashboard = () => {
   const { user, isLoading, mockLogout } = useSession();
@@ -40,6 +41,12 @@ const FarmerDashboard = () => {
   };
 
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
+
+  // Helper function to translate crop type key to display name
+  const getCropDisplayValue = (key: string) => {
+    const item = cropTypes.find(i => i.key === key);
+    return item ? getTranslation(item.en, item.bn) : key;
+  };
 
   // Calculate stats
   const totalBatches = batches.length;
@@ -87,8 +94,8 @@ const FarmerDashboard = () => {
       riskTextBn = 'উচ্চ ঝুঁকি';
     }
 
-    // Capitalize first letter for display
-    const cropTypeDisplay = batch.data.cropType.charAt(0).toUpperCase() + batch.data.cropType.slice(1);
+    // Get localized crop name
+    const cropName = getCropDisplayValue(batch.data.cropType);
 
     return (
       <Card 
@@ -102,7 +109,7 @@ const FarmerDashboard = () => {
             </div>
             <div className="flex flex-col">
               <p className="text-sm font-semibold text-foreground">
-                {getTranslation(cropTypeDisplay, cropTypeDisplay)} ({batch.data.estimatedWeight} kg)
+                {cropName} ({batch.data.estimatedWeight} kg)
               </p>
               <p className="text-xs text-muted-foreground">
                 {getTranslation("Harvested:", "সংগ্রহের তারিখ:")} {format(batch.data.harvestDate, 'MMM dd, yyyy')}
