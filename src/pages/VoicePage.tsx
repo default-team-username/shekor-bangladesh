@@ -87,16 +87,33 @@ const VoicePage = () => {
 
       // 6. ElevenLabs TTS
       try {
-        audioUrl = await elevenLabsTts(aiAnswer);
+        // elevenLabsTts now returns a Blob
+        const audioDataBlob = await elevenLabsTts(aiAnswer);
+        
+        // Create URL from Blob
+        audioUrl = URL.createObjectURL(audioDataBlob);
         
         if (audioRef.current) {
+          // Revoke previous URL if it exists to prevent memory leaks
+          if (audioRef.current.src && audioRef.current.src.startsWith('blob:')) {
+            URL.revokeObjectURL(audioRef.current.src);
+          }
+          
           audioRef.current.src = audioUrl;
-          audioRef.current.play();
+          
+          // Attempt to play audio (requires user gesture, which is satisfied by the button click initiating this flow)
+          await audioRef.current.play(); 
         }
         toast.success(getTranslation('Answer spoken!', 'উত্তর বলা হয়েছে!'), { id: loadingToastId });
       } catch (ttsError) {
-        console.error("TTS failed:", ttsError);
-        toast.warning(getTranslation('TTS failed, showing text only.', 'ভয়েস আউটপুট ব্যর্থ, শুধুমাত্র টেক্সট দেখানো হচ্ছে।'), { id: loadingToastId });
+        console.error("TTS playback failed:", ttsError);
+        // 3. Error Handling: TTS failure
+        toast.warning(getTranslation(
+          'TTS failed, showing text only.', 
+          'দুঃখিত, এখন আমি আপনার জন্য কথা বলতে পারছি না। আবার চেষ্টা করুন।'
+        ), { id: loadingToastId });
+        // Ensure audioUrl is undefined if playback failed, so we don't try to replay a broken source
+        audioUrl = undefined; 
       }
 
       // Update conversation history
@@ -189,7 +206,8 @@ const VoicePage = () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
         mediaRecorderRef.current.stop();
       }
-      if (audioRef.current) {
+      // Revoke the last created Blob URL on unmount
+      if (audioRef.current && audioRef.current.src && audioRef.current.src.startsWith('blob:')) {
         URL.revokeObjectURL(audioRef.current.src);
       }
     };

@@ -113,18 +113,21 @@ export const geminiAsk = async (
 /**
  * Mocks the ElevenLabs Text-to-Speech API call.
  * @param text The text to convert to speech.
- * @returns A Blob URL pointing to the generated audio.
+ * @returns A Blob containing the generated audio data (mocked as MP3).
  */
-export const elevenLabsTts = async (text: string): Promise<string> => {
+export const elevenLabsTts = async (text: string): Promise<Blob> => {
     const apiKey = mockDb.getApiKey('elevenlabs');
     if (!apiKey) throw new Error("ElevenLabs API key missing.");
 
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Mock audio generation by returning a placeholder Blob URL
-    // In a real scenario, this would return the actual audio stream/blob
-    const mockAudioData = new Uint8Array([0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]); // Mock MP3 header
-    const audioBlob = new Blob([mockAudioData], { type: 'audio/mp3' });
-    return URL.createObjectURL(audioBlob);
+    // Mock audio generation by returning a placeholder Blob.
+    // Using a slightly larger, more robust mock data array (1KB) to satisfy stricter browsers.
+    const mockAudioData = new Uint8Array(1024); 
+    // Set a recognizable MP3 header (ID3 tag) at the start
+    mockAudioData.set([0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 0); 
+    
+    const audioBlob = new Blob([mockAudioData], { type: 'audio/mpeg' });
+    return audioBlob;
 };
