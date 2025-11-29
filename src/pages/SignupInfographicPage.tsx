@@ -29,7 +29,7 @@ const signupSchema = z.object({
     .regex(/^\d+$/, { message: "Mobile number must contain only numbers." }),
   name: z.string().min(2, { message: "Name is required." }),
   district: z.string().min(1, { message: "Please select a district." }),
-  farmSize: z.number().min(0.1, { message: "Farm size must be greater than 0." }),
+  farmSize: z.coerce.number().min(0.1, { message: "Farm size must be greater than 0." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
@@ -163,7 +163,7 @@ const SignupInfographicPage = () => {
             {getTranslation("Farmer Registration", "কৃষক নিবন্ধন")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {getTranslation("Enter your details to join Shekor", "শেকড়ে যোগ দিতে আপনার বিবরণ লিখুন")}
+            {getTranslation("Enter your details to join Shekor", "שেকড়ে যোগ দিতে আপনার বিবরণ লিখুন")}
           </p>
         </div>
 
@@ -262,7 +262,7 @@ const SignupInfographicPage = () => {
               type="number"
               step="0.1"
               placeholder="2.5"
-              {...form.register('farmSize', { valueAsNumber: true })}
+              {...form.register('farmSize')}
               className="bg-muted/50"
             />
             {form.formState.errors.farmSize && (
@@ -311,7 +311,7 @@ const SignupInfographicPage = () => {
           <div className="flex items-center gap-2">
             <Sprout className="h-8 w-8 text-white" />
             <h1 className="text-2xl font-bold text-white">
-              {getTranslation("Shekor", "শেকড়")}
+              {getTranslation("Shekor", "שেকড়")}
             </h1>
           </div>
           <p className="text-sm text-primary-foreground/80">
