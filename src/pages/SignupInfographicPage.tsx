@@ -17,7 +17,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { mockDb } from "@/lib/mockDb";
+import { mockDb, NewUserProfileData } from "@/lib/mockDb";
 
 // --- Schema Definition ---
 const signupSchema = z.object({
@@ -126,7 +126,7 @@ const SignupInfographicPage = () => {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
-      mockDb.addUser(data);
+      mockDb.addUser(data as NewUserProfileData);
       toast.success(getTranslation('Registration successful! You can now log in.', 'নিবন্ধন সফল! আপনি এখন লগইন করতে পারেন।'), { id: loadingToastId });
       navigate('/login');
     } catch (error: any) {
