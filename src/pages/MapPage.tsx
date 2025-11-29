@@ -1,53 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Map, Shield } from 'lucide-react';
+import { ArrowLeft, MapPin, Map, Shield, ZoomIn, ZoomOut } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import BottomNavBar from '@/components/layout/BottomNavBar';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-// Fix for default marker icons in Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-// Custom icons for different risk levels using standard Leaflet icons
-const getUserIcon = () => {
-  return L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
-};
-
-const getRiskIcon = (riskLevel: 'low' | 'moderate' | 'high') => {
-  const iconColors = {
-    low: 'green',
-    moderate: 'yellow',
-    high: 'red'
-  };
-  
-  const color = iconColors[riskLevel];
-  
-  return L.icon({
-    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
-};
 
 const MapPage = () => {
   const navigate = useNavigate();
@@ -57,63 +15,12 @@ const MapPage = () => {
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
   
   const userDistrict = user?.user_metadata?.district || 'Dhaka';
-  
-  // Mock coordinates for different districts in Bangladesh
-  const districtCoordinates: Record<string, [number, number]> = {
-    'Dhaka': [23.8103, 90.4125],
-    'Chittagong': [22.3569, 91.7832],
-    'Rajshahi': [24.3740, 88.6011],
-    'Khulna': [22.8456, 89.5403],
-    'Barisal': [22.7010, 90.3535],
-    'Sylhet': [24.8949, 91.8687],
-    'Rangpur': [25.7439, 89.2752],
-    'Mymensingh': [24.7471, 90.4203],
-    'Comilla': [23.4643, 91.1670],
-    'Narayanganj': [23.6337, 90.5033],
-  };
-  
-  // Get user coordinates or default to Dhaka
-  const userCoordinates = districtCoordinates[userDistrict] || districtCoordinates['Dhaka'];
-  
-  // Mock neighbor data with coordinates near user location
-  const [neighborData, setNeighborData] = useState<Array<{
-    id: number;
-    coordinates: [number, number];
-    riskLevel: 'low' | 'moderate' | 'high';
-    cropType: string;
-  }>>([]);
-  
-  useEffect(() => {
-    // Generate mock neighbor data near user location
-    const generateNeighbors = () => {
-      const neighbors = [];
-      const [userLat, userLng] = userCoordinates;
-      
-      // Generate 12 neighbors with different risk levels
-      for (let i = 0; i < 12; i++) {
-        // Generate coordinates near user location (within ~5km)
-        const latOffset = (Math.random() - 0.5) * 0.05;
-        const lngOffset = (Math.random() - 0.5) * 0.05;
-        
-        neighbors.push({
-          id: i + 1,
-          coordinates: [userLat + latOffset, userLng + lngOffset] as [number, number],
-          riskLevel: i < 4 ? 'low' : i < 9 ? 'moderate' : 'high',
-          cropType: i % 3 === 0 ? 'Paddy' : i % 3 === 1 ? 'Wheat' : 'Maize',
-        });
-      }
-      
-      setNeighborData(neighbors);
-    };
-    
-    generateNeighbors();
-  }, [userCoordinates]);
 
   // Risk indicator data
   const riskIndicators = [
-    { emoji: '🟢', count: neighborData.filter(n => n.riskLevel === 'low').length, labelEn: 'Low Risk', labelBn: 'নিম্ন ঝুঁকি', color: 'text-primary' },
-    { emoji: '🟡', count: neighborData.filter(n => n.riskLevel === 'moderate').length, labelEn: 'Moderate', labelBn: 'মাঝারি', color: 'text-harvest-yellow' },
-    { emoji: '🔴', count: neighborData.filter(n => n.riskLevel === 'high').length, labelEn: 'High Risk', labelBn: 'উচ্চ ঝুঁকি', color: 'text-destructive' },
+    { emoji: '🟢', count: 4, labelEn: 'Low Risk', labelBn: 'নিম্ন ঝুঁকি', color: 'text-primary' },
+    { emoji: '🟡', count: 5, labelEn: 'Moderate', labelBn: 'মাঝারি', color: 'text-harvest-yellow' },
+    { emoji: '🔴', count: 3, labelEn: 'High Risk', labelBn: 'উচ্চ ঝুঁকি', color: 'text-destructive' },
   ];
 
   return (
@@ -194,54 +101,73 @@ const MapPage = () => {
           ))}
         </div>
 
-        {/* Leaflet Map Visualization */}
+        {/* Map Visualization */}
         <Card className="w-full border-border shadow-lg rounded-2xl overflow-hidden">
-          <CardContent className="p-0 relative">
-            <div className="h-96 w-full">
-              <MapContainer 
-                center={userCoordinates} 
-                zoom={13} 
-                style={{ height: '100%', width: '100%' }}
-                className="rounded-2xl overflow-hidden"
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                
-                {/* User Location Marker */}
-                <Marker position={userCoordinates} icon={getUserIcon()}>
-                  <Popup>
-                    <div className="font-semibold">
-                      {getTranslation("Your Location", "আপনার অবস্থান")}
-                    </div>
-                    <div className="text-sm">
-                      {userDistrict}
-                    </div>
-                  </Popup>
-                </Marker>
-                
-                {/* Neighbor Risk Markers */}
-                {neighborData.map((neighbor) => (
-                  <Marker 
-                    key={neighbor.id}
-                    position={neighbor.coordinates}
-                    icon={getRiskIcon(neighbor.riskLevel)}
-                  >
-                    <Popup>
-                      <div className="font-semibold">
-                        {getTranslation("Neighbor Farmer", "প্রতিবেশী কৃষক")}
-                      </div>
-                      <div className="text-sm">
-                        {getTranslation(`Risk Level: ${neighbor.riskLevel}`, `ঝুঁকি স্তর: ${neighbor.riskLevel}`)}
-                      </div>
-                      <div className="text-sm">
-                        {getTranslation(`Crop: ${neighbor.cropType}`, `ফসল: ${neighbor.cropType}`)}
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
+          <CardContent className="p-0 relative h-96 bg-gray-200">
+            {/* Map Placeholder with Grid Pattern */}
+            <div className="absolute inset-0 bg-gray-300">
+              {/* Grid lines */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,gray_1px,transparent_1px),linear-gradient(to_bottom,gray_1px,transparent_1px)] bg-[size:20px_20px] opacity-20"></div>
+              
+              {/* Farmer locations with different risk levels */}
+              {/* Low Risk Farmers (Green) */}
+              <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-1/3 left-2/3 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-2/3 left-1/3 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-3/4 left-3/4 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              
+              {/* Moderate Risk Farmers (Yellow) */}
+              <div className="absolute top-1/2 left-1/2 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-1/4 left-3/4 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-3/4 left-1/4 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-2/3 left-2/3 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-1/3 left-1/5 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              
+              {/* High Risk Farmers (Red) */}
+              <div className="absolute top-1/2 left-1/3 w-6 h-6 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-2/3 left-1/2 w-6 h-6 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              <div className="absolute top-1/4 left-1/2 w-6 h-6 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs font-bold">🌾</span>
+              </div>
+              
+              {/* User Location (Blue Pin) */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-12 h-12 bg-blue-600 border-4 border-white rounded-full flex items-center justify-center shadow-lg rotate-45">
+                  <MapPin className="h-6 w-6 text-white -rotate-45" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Zoom Controls */}
+            <div className="absolute top-4 left-4 flex flex-col gap-2">
+              <Button size="icon" variant="secondary" className="h-8 w-8 rounded shadow">
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="secondary" className="h-8 w-8 rounded shadow">
+                <ZoomOut className="h-4 w-4" />
+              </Button>
             </div>
             
             {/* Map Attribution */}
