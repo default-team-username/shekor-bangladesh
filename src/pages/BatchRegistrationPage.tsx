@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,7 +7,8 @@ import { ArrowLeft, Wheat } from 'lucide-react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBatch } from '@/contexts/BatchContext';
-import { useSession } from '@/contexts/SessionContext'; // Import useSession
+import { useSession } from '@/contexts/SessionContext';
+import { useWeather } from '@/hooks/useWeather';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -20,8 +21,9 @@ import { generateMockPrediction } from '@/utils/prediction.ts';
 const BatchRegistrationPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const { addBatch, batches } = useBatch(); // Get batches here to check length
-  const { updateScore } = useSession(); // Get updateScore
+  const { addBatch, batches } = useBatch();
+  const { user, updateScore } = useSession();
+  const { current: currentWeatherData, isLoading: isWeatherLoading } = useWeather();
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [submittedData, setSubmittedData] = useState<BatchFormValues | null>(null);
   const [showFirstBatchModal, setShowFirstBatchModal] = useState(false);
@@ -32,40 +34,45 @@ const BatchRegistrationPage = () => {
       cropType: '',
       estimatedWeight: 0,
       harvestDate: undefined,
-      storageLocation: '',
-      storageMethod: '',
+      storageLocation: user?.user_metadata?.district || '',
       storageTemperature: 25,
       moistureLevel: 60,
     },
     mode: 'onChange',
   });
 
+  // Effect to autofill weather data
+  useEffect(() => {
+    if (currentWeatherData && !isWeatherLoading) {
+      formMethods.setValue('storageTemperature', currentWeatherData.temp, { shouldValidate: true });
+      formMethods.setValue('moistureLevel', currentWeatherData.humidity, { shouldValidate: true });
+      
+      const toastMessage = language === 'en' 
+        ? `Weather data for ${user?.user_metadata?.district} loaded.`
+        : `${user?.user_metadata?.district}-এর আবহাওয়ার ডেটা লোড হয়েছে।`;
+      toast.info(toastMessage);
+    }
+  }, [currentWeatherData, isWeatherLoading, user, formMethods, language]);
+
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
   const onSubmit = async (data: BatchFormValues) => {
-    // Check if this is the first batch BEFORE adding it
     const isFirstBatch = batches.length === 0; 
     
     const loadingToastId = toast.loading(getTranslation('Calculating risk prediction...', 'ঝুঁকি পূর্বাভাস গণনা করা হচ্ছে...'));
 
-    // Mock API call
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const result = generateMockPrediction(data);
     
-    // Save the batch immediately upon prediction generation
     addBatch(data, result);
-    
-    // Add score for new batch
     updateScore(100);
     
-    // Set state to display the prediction card (ETCL)
     setPrediction(result);
     setSubmittedData(data);
     
     toast.success(getTranslation('Prediction available!', 'পূর্বাভাস উপলব্ধ!'), { id: loadingToastId });
 
-    // If it was the first batch, show the celebratory modal
     if (isFirstBatch) {
       setShowFirstBatchModal(true);
     }
@@ -75,7 +82,6 @@ const BatchRegistrationPage = () => {
     setShowFirstBatchModal(false);
   };
 
-  // --- Main Render ---
   return (
     <div 
       className="min-h-screen flex flex-col items-center"
@@ -83,10 +89,8 @@ const BatchRegistrationPage = () => {
         background: 'linear-gradient(180deg, hsl(130 40% 98%) 0%, hsl(130 40% 90%) 100%)',
       }}
     >
-      {/* Header */}
       <header className="sticky top-0 z-10 w-full bg-primary shadow-md">
         <div className="container mx-auto flex h-[68px] items-center gap-3 px-4">
-          {/* Back Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -95,8 +99,6 @@ const BatchRegistrationPage = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-
-          {/* Title Container */}
           <div className="flex flex-col">
             <h1 className="text-base font-semibold text-primary-foreground">
               {getTranslation("New Batch Registration", "নতুন ব্যাচ নিবন্ধন")}
@@ -108,16 +110,13 @@ const BatchRegistrationPage = () => {
         </div>
       </header>
 
-      {/* Main Content Card Container */}
       <div className="container mx-auto flex justify-center py-8 w-full max-w-md">
         <div className="w-full space-y-4">
           
-          {/* Conditional Rendering: Show Prediction or Form */}
           {prediction && submittedData ? (
             <PredictionResultCard result={prediction} data={submittedData} />
           ) : (
             <>
-              {/* Info Card (Only shown before submission) */}
               <Card className="w-full bg-blue-50/50 border-blue-200/80 shadow-sm">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100/80">
@@ -134,7 +133,6 @@ const BatchRegistrationPage = () => {
                 </CardContent>
               </Card>
 
-              {/* Registration Form */}
               <Card className="w-full p-6 shadow-lg border-border/50">
                 <CardContent className="p-0">
                   <FormProvider {...formMethods}>
@@ -147,7 +145,6 @@ const BatchRegistrationPage = () => {
         </div>
       </div>
       
-      {/* First Batch Success Modal */}
       <FirstBatchSuccessModal 
         isOpen={showFirstBatchModal} 
         onClose={handleCloseModal} 

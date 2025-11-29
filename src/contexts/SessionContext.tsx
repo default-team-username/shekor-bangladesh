@@ -4,7 +4,7 @@ import { useLanguage } from './LanguageContext';
 import { toast } from 'sonner';
 
 // --- New types and constants for scoring ---
-type BadgeKey = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Master';
+export type BadgeKey = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Master';
 
 const BADGE_THRESHOLDS: { score: number; key: BadgeKey; en: string; bn: string }[] = [
   { score: 1000, key: 'Bronze', en: 'Bronze', bn: 'ব্রোঞ্জ' },
@@ -23,7 +23,7 @@ const getCurrentBadge = (score: number): { score: number; key: BadgeKey; en: str
 };
 
 // --- Mock Types for Prototyping ---
-interface MockUser {
+export interface MockUser {
   id: string;
   email: string;
   user_metadata: {

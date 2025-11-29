@@ -7,6 +7,10 @@ import { fetchWeather } from "@/utils/weather";
 interface WeatherHookResult {
     forecast: DailyForecast[];
     alerts: WeatherAlert[];
+    current: {
+        temp: number;
+        humidity: number;
+    } | null;
     isLoading: boolean;
     error: Error | null;
     isStaleCache: boolean;
@@ -29,11 +33,12 @@ export const useWeather = (): WeatherHookResult => {
     gcTime: 86400000, // 24 hours
   });
   
-  const result = data || { data: [], alerts: [], isCached: false, isStale: false };
+  const result = data || { data: [], alerts: [], current: null, isCached: false, isStale: false };
 
   return {
     forecast: result.data,
     alerts: result.alerts,
+    current: result.current,
     isLoading: isLoading || isFetching,
     error: error as Error | null,
     isStaleCache: result.isStale,

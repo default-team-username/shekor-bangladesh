@@ -154,8 +154,8 @@ const BatchRegistrationForm: React.FC<BatchRegistrationFormProps> = ({ onSubmit 
         <Input
           id="storageTemperature"
           type="number"
-          step="1"
-          placeholder={getTranslation("25", "২৫")}
+          step="0.1"
+          placeholder={getTranslation("25.5", "২৫.৫")}
           {...register('storageTemperature', { valueAsNumber: true })}
           className="bg-muted/50 h-12 rounded-xl"
         />
@@ -181,7 +181,6 @@ const BatchRegistrationForm: React.FC<BatchRegistrationFormProps> = ({ onSubmit 
         <p className="text-xs text-muted-foreground">{getTranslation("Current moisture level of the crop/storage.", "ফসল/সংরক্ষণের বর্তমান আর্দ্রতার মাত্রা।")}</p>
       </div>
 
-      {/* Submit Button */}
       <Button type="submit" className="w-full text-lg font-semibold h-12 mt-6 rounded-xl" disabled={!isValid}>
         {getTranslation("Get Prediction", "পূর্বাভাস দেখুন")}
       </Button>

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sprout, ArrowRight, ArrowLeft, User, Smartphone, MapPin, Ruler, CreditCard } from "lucide-react";
+import { Sprout, ArrowRight, ArrowLeft, User, Smartphone, MapPin, Ruler, CreditCard, Lock } from "lucide-react";
 import { toast } from "sonner";
 import {
   Carousel,
@@ -17,7 +17,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-// import { supabase } from "@/integrations/supabase/client"; // Removed Supabase import
+import { mockDb } from "@/lib/mockDb";
 
 // --- Schema Definition ---
 const signupSchema = z.object({
@@ -64,8 +64,6 @@ const districts = [
   "Dhaka", "Chittagong", "Rajshahi", "Khulna", "Barisal", "Sylhet", "Rangpur", "Mymensingh", "Comilla", "Narayanganj"
 ];
 
-const MOCK_SIGNUP_CREDENTIALS_KEY = 'mock_signup_credentials';
-
 const SignupInfographicPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -84,7 +82,7 @@ const SignupInfographicPage = () => {
       farmSize: 0,
       password: '',
     },
-    mode: 'onBlur', // Changed validation mode to 'onBlur'
+    mode: 'onBlur',
   });
 
   const { formState } = form;
@@ -107,7 +105,6 @@ const SignupInfographicPage = () => {
     if (current < totalSteps - 1) {
       api?.scrollNext();
     } else {
-      // Last step: Show the actual signup form
       setShowForm(true);
     }
   };
@@ -126,25 +123,17 @@ const SignupInfographicPage = () => {
   const onSubmit = async (data: SignupFormValues) => {
     const loadingToastId = toast.loading(getTranslation('Registering...', 'নিবন্ধন হচ্ছে...'));
 
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // --- Mock Persistence Logic ---
-    const mockUserData = {
-      mobile: data.mobile,
-      password: data.password,
-      name: data.name,
-      district: data.district,
-      role: 'farmer', // Signed up users are farmers
-    };
-    localStorage.setItem(MOCK_SIGNUP_CREDENTIALS_KEY, JSON.stringify(mockUserData));
-    // --- End Mock Persistence Logic ---
-
-    toast.success(getTranslation('Registration successful! You can now log in.', 'নিবন্ধন সফল! আপনি এখন লগইন করতে পারেন।'), { id: loadingToastId });
-    navigate('/login');
+    try {
+      mockDb.addUser(data);
+      toast.success(getTranslation('Registration successful! You can now log in.', 'নিবন্ধন সফল! আপনি এখন লগইন করতে পারেন।'), { id: loadingToastId });
+      navigate('/login');
+    } catch (error: any) {
+      toast.error(getTranslation(error.message, 'এই মোবাইল নম্বর দিয়ে ইতিমধ্যে নিবন্ধন করা হয়েছে।'), { id: loadingToastId });
+    }
   };
 
-  // --- Digital Farmer Score Card ---
   const DigitalFarmerScoreCard = () => (
     <Card className="w-full bg-harvest-yellow/10 border-harvest-yellow/50 shadow-lg">
       <CardContent className="p-4 flex justify-between items-center">
@@ -166,7 +155,6 @@ const SignupInfographicPage = () => {
     </Card>
   );
 
-  // --- Registration Form ---
   const RegistrationForm = () => (
     <Card className="w-full max-w-md p-8 shadow-2xl border-border/50">
       <CardContent className="p-0">
@@ -182,7 +170,6 @@ const SignupInfographicPage = () => {
         <DigitalFarmerScoreCard />
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
-          {/* NID Input */}
           <div className="space-y-2">
             <Label htmlFor="nid" className="flex items-center gap-2 text-sm font-medium">
               <CreditCard className="h-4 w-4 text-primary" />
@@ -203,7 +190,6 @@ const SignupInfographicPage = () => {
             )}
           </div>
 
-          {/* Name Input */}
           <div className="space-y-2">
             <Label htmlFor="name" className="flex items-center gap-2 text-sm font-medium">
               <User className="h-4 w-4 text-primary" />
@@ -222,7 +208,6 @@ const SignupInfographicPage = () => {
             )}
           </div>
 
-          {/* Mobile Number Input */}
           <div className="space-y-2">
             <Label htmlFor="mobile" className="flex items-center gap-2 text-sm font-medium">
               <Smartphone className="h-4 w-4 text-primary" />
@@ -243,7 +228,6 @@ const SignupInfographicPage = () => {
             )}
           </div>
 
-          {/* District Select */}
           <div className="space-y-2">
             <Label htmlFor="district" className="flex items-center gap-2 text-sm font-medium">
               <MapPin className="h-4 w-4 text-primary" />
@@ -268,7 +252,6 @@ const SignupInfographicPage = () => {
             )}
           </div>
 
-          {/* Farm Size Input */}
           <div className="space-y-2">
             <Label htmlFor="farmSize" className="flex items-center gap-2 text-sm font-medium">
               <Ruler className="h-4 w-4 text-primary" />
@@ -289,10 +272,9 @@ const SignupInfographicPage = () => {
             )}
           </div>
 
-          {/* Password Input (for Supabase Auth) */}
           <div className="space-y-2">
             <Label htmlFor="password" className="flex items-center gap-2 text-sm font-medium">
-              <Smartphone className="h-4 w-4 text-primary" />
+              <Lock className="h-4 w-4 text-primary" />
               {getTranslation("Set Password", "পাসওয়ার্ড সেট করুন")}
             </Label>
             <Input
@@ -309,7 +291,6 @@ const SignupInfographicPage = () => {
             )}
           </div>
 
-          {/* Submit Button */}
           <Button type="submit" className="w-full text-lg font-semibold h-12 mt-6" disabled={!isFormValid}>
             {getTranslation("Complete Registration", "নিবন্ধন সম্পন্ন করুন")}
           </Button>
@@ -318,16 +299,13 @@ const SignupInfographicPage = () => {
     </Card>
   );
 
-  // --- Main Render ---
   return (
     <div
       className="flex min-h-screen flex-col items-center"
       style={{
-        // Updated to use the primary color (130 45% 35%) for the gradient
         background: "linear-gradient(180deg, hsl(130 45% 45%) 0%, hsl(130 45% 25%) 100%)",
       }}
     >
-      {/* Header */}
       <header className="w-full py-4 px-4 bg-primary">
         <div className="container mx-auto flex flex-col items-center justify-center">
           <div className="flex items-center gap-2">
@@ -342,7 +320,6 @@ const SignupInfographicPage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <div className="container mx-auto flex flex-grow items-center justify-center py-12">
         {showForm ? (
           <RegistrationForm />
@@ -374,10 +351,8 @@ const SignupInfographicPage = () => {
         )}
       </div>
 
-      {/* Footer Navigation and Pagination */}
       <footer className="w-full py-6 px-4">
         <div className="container mx-auto flex max-w-md flex-col items-center gap-4">
-          {/* Pagination Dots (Only show if not on form) */}
           {!showForm && (
             <div className="flex gap-2">
               {stepsData.map((_, index) => (
@@ -394,7 +369,6 @@ const SignupInfographicPage = () => {
             </div>
           )}
 
-          {/* Navigation Buttons */}
           <div className="flex w-full gap-4">
             <Button
               onClick={handlePrevious}

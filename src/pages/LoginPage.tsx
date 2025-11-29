@@ -11,20 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Sprout, Phone, Lock, Wheat, Briefcase, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from '@/contexts/SessionContext';
-
-// --- Mock Credentials ---
-const MOCK_MOBILE = '01312345678';
-const MOCK_PASSWORD = 'asdfgh';
-const MOCK_USER_NAME = 'Shekhor';
-const MOCK_DISTRICT = 'Dhaka';
-
-const MOCK_SIGNUP_CREDENTIALS_KEY = 'mock_signup_credentials';
+import { mockDb } from '@/lib/mockDb';
+import { type MockUser } from '@/contexts/SessionContext';
 
 // --- Schema Definition ---
 const loginSchema = z.object({
   mobile: z.string().min(10, { message: "Mobile number must be at least 10 digits." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  role: z.enum(['farmer', 'executive'], { // Updated enum: removed 'buyer'
+  role: z.enum(['farmer', 'executive'], {
     errorMap: () => ({ message: "Please select a role." }),
   }),
 });
@@ -61,7 +55,7 @@ const LoginPage = () => {
     defaultValues: {
       mobile: '',
       password: '',
-      role: 'farmer', // Default selection
+      role: 'farmer',
     },
   });
 
@@ -72,54 +66,22 @@ const LoginPage = () => {
   };
 
   const onSubmit = async (data: LoginFormValues) => {
-    const { mobile, password, role } = data;
+    const { mobile, password } = data;
     
     const loadingToastId = toast.loading(language === 'en' ? 'Signing In...' : 'সাইন ইন হচ্ছে...');
 
-    let isAuthenticated = false;
-    let userDetails = null;
+    const userProfile = mockDb.getUserByMobile(mobile);
 
-    // 1. Check against dynamically registered mock user (from signup page)
-    const storedCredentialsString = localStorage.getItem(MOCK_SIGNUP_CREDENTIALS_KEY);
-    if (storedCredentialsString) {
-      try {
-        const storedCredentials = JSON.parse(storedCredentialsString);
-        if (mobile === storedCredentials.mobile && password === storedCredentials.password && role === storedCredentials.role) {
-          isAuthenticated = true;
-          userDetails = {
-            id: 'mock-user-id-dynamic',
-            email: `${mobile}@shekor.com`,
-            user_metadata: {
-              name: storedCredentials.name,
-              district: storedCredentials.district,
-              role: storedCredentials.role,
-            }
-          };
-        }
-      } catch (e) {
-        console.error("Failed to parse stored mock credentials:", e);
-      }
-    }
-
-    // 2. Fallback to hardcoded mock user if not authenticated yet
-    if (!isAuthenticated && mobile === MOCK_MOBILE && password === MOCK_PASSWORD) {
-      isAuthenticated = true;
-      userDetails = {
-        id: 'mock-user-id-123',
-        email: `${mobile}@shekor.com`,
-        user_metadata: {
-          name: MOCK_USER_NAME,
-          district: MOCK_DISTRICT,
-          role: role, // Use the selected role for the hardcoded user
-        }
-      };
-    }
-
-    // --- Mock Login Logic ---
-    if (isAuthenticated && userDetails) {
+    // In a real app, you'd compare hashed passwords
+    if (userProfile && userProfile.password_hash === password) {
       toast.success(language === 'en' ? 'Login successful!' : 'লগইন সফল!', { id: loadingToastId });
-      mockLogin(userDetails);
       
+      const userForSession: MockUser = {
+        id: userProfile.id,
+        email: `${userProfile.mobile}@shekor.com`,
+        user_metadata: userProfile.user_metadata,
+      };
+      mockLogin(userForSession);
     } else {
       toast.error(language === 'en' ? 'Authentication failed: Invalid credentials.' : 'প্রমাণীকরণ ব্যর্থ হয়েছে।', { id: loadingToastId });
     }
@@ -127,27 +89,21 @@ const LoginPage = () => {
 
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
-  // --- Component Structure based on CSS specs ---
   return (
     <div 
       className="min-h-screen flex flex-col items-center"
       style={{ 
-        // Replicating the light green gradient background
         background: 'linear-gradient(135deg, hsl(130 40% 98%) 0%, hsl(130 40% 90%) 50%, hsl(130 40% 99%) 100%)',
       }}
     >
-      {/* Header (Based on CSS spec: Green background, fixed top) */}
       <header className="sticky top-0 z-10 w-full bg-primary shadow-md">
         <div className="container mx-auto flex h-[68px] items-center justify-between px-4">
-          {/* Logo/Title */}
           <div className="flex items-center gap-2">
             <Sprout className="h-8 w-8 text-primary-foreground" />
             <h1 className="text-xl font-bold text-primary-foreground">
               {getTranslation("Shekor", "শেকড়")}
             </h1>
           </div>
-
-          {/* Back Button */}
           <Button
             variant="ghost"
             size="sm"
@@ -160,17 +116,13 @@ const LoginPage = () => {
         </div>
       </header>
 
-      {/* Main Content Card */}
       <div className="container mx-auto flex justify-center py-12">
         <Card className="w-full max-w-md p-8 shadow-2xl border-border/50">
           <CardContent className="p-0">
             <div className="flex flex-col items-center text-center">
-              {/* Icon Container */}
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary shadow-lg">
                 <Sprout className="h-10 w-10 text-primary-foreground" />
               </div>
-              
-              {/* Headings */}
               <h2 className="text-xl font-bold text-foreground">
                 {getTranslation("Welcome Back", "স্বাগতম")}
               </h2>
@@ -180,7 +132,6 @@ const LoginPage = () => {
             </div>
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
-              {/* --- Role Selection --- */}
               <div className="space-y-3">
                 <Label className="text-center block">
                   <span className="text-sm font-medium text-foreground block">
@@ -217,7 +168,6 @@ const LoginPage = () => {
                 )}
               </div>
 
-              {/* --- Mobile Number Input --- */}
               <div className="space-y-2">
                 <Label htmlFor="mobile">
                   <span className="text-sm font-medium text-foreground block">
@@ -242,7 +192,6 @@ const LoginPage = () => {
                 )}
               </div>
 
-              {/* --- Password Input --- */}
               <div className="space-y-2">
                 <Label htmlFor="password">
                   <span className="text-sm font-medium text-foreground block">
@@ -266,20 +215,17 @@ const LoginPage = () => {
                 )}
               </div>
 
-              {/* Forgot Password Link */}
               <div className="text-right">
                 <Button variant="link" type="button" className="h-auto p-0 text-primary hover:text-primary/80 text-sm">
                   {getTranslation("Forgot password?", "পাসওয়ার্ড ভুলে গেছেন?")}
                 </Button>
               </div>
 
-              {/* Sign In Button */}
               <Button type="submit" className="w-full text-lg font-semibold h-10">
                 {getTranslation("Sign In", "সাইন ইন")}
               </Button>
             </form>
 
-            {/* Sign Up Link (Now using proper button with onClick handler) */}
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
                 {getTranslation("Don't have an account?", "অ্যাকাউন্ট নেই?")}
@@ -291,17 +237,6 @@ const LoginPage = () => {
               >
                 {getTranslation("Sign Up", "সাইন আপ করুন")}
               </Button>
-            </div>
-
-            {/* Demo App Notice */}
-            <div className="mt-8 p-3 bg-secondary rounded-xl text-center text-xs text-muted-foreground">
-              <p className="font-semibold">
-                <Lock className="inline h-3 w-3 mr-1" />
-                {getTranslation("This is a demo app.", "এটি একটি ডেমো অ্যাপ।")}
-              </p>
-              <p className="mt-1">
-                {getTranslation(`Use Mobile: ${MOCK_MOBILE} / Password: ${MOCK_PASSWORD} or your recently signed up credentials.`, `ব্যবহার করুন: মোবাইল: ${MOCK_MOBILE} / পাসওয়ার্ড: ${MOCK_PASSWORD} অথবা আপনার সম্প্রতি সাইন আপ করা শংসাপত্র।`)}
-              </p>
             </div>
           </CardContent>
         </Card>

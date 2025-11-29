@@ -5,6 +5,7 @@ import { format } from "date-fns";
 interface WeatherApiResponse {
   current: {
     temp_c: number;
+    humidity: number;
   };
   forecast: {
     forecastday: Array<{
@@ -27,6 +28,10 @@ interface WeatherApiResponse {
 interface WeatherFetchResult {
     data: DailyForecast[];
     alerts: WeatherAlert[];
+    current: {
+        temp: number;
+        humidity: number;
+    };
     isCached: boolean;
     isStale: boolean;
 }
@@ -139,7 +144,6 @@ const generateCustomAlerts = (forecast: DailyForecast[], lang: 'en' | 'bn'): Wea
 // Helper to map WeatherAPI response to DailyForecast structure
 const mapForecastToDailyForecast = (
   forecastDay: WeatherApiResponse['forecast']['forecastday'][0],
-  currentTempC: number,
   lang: 'en' | 'bn',
   index: number,
 ): DailyForecast => {
@@ -193,9 +197,8 @@ const mapForecastToDailyForecast = (
 
 // Function to transform raw API data
 const transformApiData = (apiData: WeatherApiResponse, lang: 'en' | 'bn'): DailyForecast[] => {
-    const currentTemp = apiData.current.temp_c;
     return apiData.forecast.forecastday.map((dayData, index) => {
-        return mapForecastToDailyForecast(dayData, currentTemp, lang, index);
+        return mapForecastToDailyForecast(dayData, lang, index);
     });
 }
 
@@ -211,7 +214,7 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
   const cachedDataString = localStorage.getItem(cacheKey);
   const now = Date.now();
   
-  let cachedResult: { timestamp: number, data: DailyForecast[] } | null = null;
+  let cachedResult: { timestamp: number, data: DailyForecast[], current: { temp: number, humidity: number } } | null = null;
   let isStale = false;
 
   if (cachedDataString) {
@@ -228,7 +231,7 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
       if (!isStale) {
         // Fresh cache hit: regenerate alerts from cached forecast data
         const cachedAlerts = generateCustomAlerts(cachedResult.data, lang);
-        return { data: cachedResult.data, alerts: cachedAlerts, isCached: true, isStale: false };
+        return { data: cachedResult.data, alerts: cachedAlerts, current: cachedResult.current, isCached: true, isStale: false };
       }
     } catch (e) {
       console.error("Error parsing cached data:", e);
@@ -238,14 +241,12 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
   }
 
   // --- Attempt Network Fetch ---
-  // Updated apiUrl to include alerts=yes and aqi=no
   const apiUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location}&days=5&lang=${lang}&alerts=yes&aqi=no`;
 
   try {
     const response = await fetch(apiUrl);
     
     if (!response.ok) {
-      // Attempt to parse error message from API if available
       const errorBody = await response.json().catch(() => ({}));
       const errorMessage = errorBody.error?.message || `Weather API returned status ${response.status}`;
       throw new Error(errorMessage);
@@ -254,26 +255,28 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
     const apiData: WeatherApiResponse = await response.json();
     const transformedData = transformApiData(apiData, lang);
     const generatedAlerts = generateCustomAlerts(transformedData, lang);
+    const currentConditions = {
+        temp: apiData.current.temp_c,
+        humidity: apiData.current.humidity,
+    };
 
     // Cache successful response
     localStorage.setItem(cacheKey, JSON.stringify({
       timestamp: now,
       data: transformedData,
+      current: currentConditions,
     }));
 
-    return { data: transformedData, alerts: generatedAlerts, isCached: false, isStale: false };
+    return { data: transformedData, alerts: generatedAlerts, current: currentConditions, isCached: false, isStale: false };
 
   } catch (error) {
     console.error("Error fetching weather data:", error);
     
-    // If network fails, return stale cache if available
     if (cachedResult) {
         const cachedAlerts = generateCustomAlerts(cachedResult.data, lang);
-        // Return stale cache data
-        return { data: cachedResult.data, alerts: cachedAlerts, isCached: true, isStale: true };
+        return { data: cachedResult.data, alerts: cachedAlerts, current: cachedResult.current, isCached: true, isStale: true };
     }
     
-    // If no cache available, throw the required error message
     throw new Error(lang === 'bn' 
         ? 'আবহাওয়ার তথ্য লোড করা যাচ্ছে না। A network error occurred and no cached data is available.' 
         : 'Failed to load weather data. A network error occurred and no cached data is available.');
