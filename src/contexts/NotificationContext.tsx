@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { SmartAlert } from '@/utils/gemini';
 
 export interface Notification extends SmartAlert {
@@ -38,7 +38,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifications));
   }, [notifications]);
 
-  const addNotification = useCallback((alert: SmartAlert) => {
+  const addNotification = (alert: SmartAlert) => {
     const newNotification: Notification = {
       ...alert,
       id: Date.now().toString(),
@@ -46,17 +46,17 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       isRead: false,
     };
     setNotifications(prev => [newNotification, ...prev].slice(0, 50)); // Keep last 50
-  }, []);
+  };
 
-  const markAsRead = useCallback((id: string) => {
+  const markAsRead = (id: string) => {
     setNotifications(prev =>
       prev.map(n => (n.id === id ? { ...n, isRead: true } : n))
     );
-  }, []);
+  };
 
-  const markAllAsRead = useCallback(() => {
+  const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-  }, []);
+  };
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
