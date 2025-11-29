@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Map, Shield, ZoomIn, ZoomOut } from 'lucide-react';
+import { ArrowLeft, MapPin, Map, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
@@ -18,33 +18,35 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom icons for different risk levels
-const createRiskIcon = (color: string) => {
-  return L.divIcon({
-    className: 'custom-icon',
-    html: `<div style="background-color: ${color}; width: 24px; height: 24px; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-      <span style="color: white; font-size: 12px;">🌾</span>
-    </div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
+// Custom icons for different risk levels using standard Leaflet icons
+const getUserIcon = () => {
+  return L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
   });
 };
 
-const userIcon = L.divIcon({
-  className: 'user-icon',
-  html: `<div style="background-color: #3b82f6; width: 32px; height: 32px; border: 4px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white">
-      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
-    </svg>
-  </div>`,
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-});
-
-const riskIcons = {
-  low: createRiskIcon('#16a34a'),      // green-600
-  moderate: createRiskIcon('#eab308'), // yellow-500
-  high: createRiskIcon('#dc2626'),      // red-600
+const getRiskIcon = (riskLevel: 'low' | 'moderate' | 'high') => {
+  const iconColors = {
+    low: 'green',
+    moderate: 'yellow',
+    high: 'red'
+  };
+  
+  const color = iconColors[riskLevel];
+  
+  return L.icon({
+    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
 };
 
 const MapPage = () => {
@@ -208,7 +210,7 @@ const MapPage = () => {
                 />
                 
                 {/* User Location Marker */}
-                <Marker position={userCoordinates} icon={userIcon}>
+                <Marker position={userCoordinates} icon={getUserIcon()}>
                   <Popup>
                     <div className="font-semibold">
                       {getTranslation("Your Location", "আপনার অবস্থান")}
@@ -224,7 +226,7 @@ const MapPage = () => {
                   <Marker 
                     key={neighbor.id}
                     position={neighbor.coordinates}
-                    icon={riskIcons[neighbor.riskLevel]}
+                    icon={getRiskIcon(neighbor.riskLevel)}
                   >
                     <Popup>
                       <div className="font-semibold">
