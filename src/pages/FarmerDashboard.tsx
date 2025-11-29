@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { cropTypes } from '@/data/batchData';
 import BottomNavBar from '@/components/layout/BottomNavBar';
 import BadgeDisplay from '@/components/dashboard/BadgeDisplay'; // Import new component
+import Alerts from '@/components/Alerts'; // Import Alerts component
 
 const FarmerDashboard = () => {
   const { user, isLoading, mockLogout } = useSession();
@@ -164,6 +165,9 @@ const FarmerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Alerts Component (Example Usage) */}
+      <Alerts weather={{ weatherStatus: "good" }} risk={{ riskLevel: "Critical" }} />
+      
       {/* Main Container */}
       <div className="flex flex-col items-center pb-20 md:pb-0"> {/* Added pb-20 for bottom nav bar clearance */}
         
