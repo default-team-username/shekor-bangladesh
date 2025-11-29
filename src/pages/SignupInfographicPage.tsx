@@ -17,7 +17,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { mockDb } from "@/lib/mockDb";
+import { mockDb, type NewUserProfileData } from "@/lib/mockDb";
 
 // --- Schema Definition ---
 const signupSchema = z.object({
