@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { useBatch, StoredBatch } from '@/contexts/BatchContext';
 import { format } from 'date-fns';
 import { cropTypes } from '@/data/batchData';
-import BottomNavBar from '@/components/layout/BottomNavBar'; // Import the new component
+import BottomNavBar from '@/components/layout/BottomNavBar';
+import BadgeDisplay from '@/components/dashboard/BadgeDisplay'; // Import new component
 
 const FarmerDashboard = () => {
   const { user, isLoading, mockLogout } = useSession();
@@ -32,7 +33,8 @@ const FarmerDashboard = () => {
   // Extract user metadata
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Farmer';
   const userDistrict = user?.user_metadata?.district || 'Dhaka';
-
+  const totalScore = user?.user_metadata?.totalScore ?? 0; // Use actual score
+  
   const handleLogout = () => {
     mockLogout();
   };
@@ -52,13 +54,11 @@ const FarmerDashboard = () => {
   // Calculate stats
   const totalBatches = batches.length;
   const highRiskBatches = batches.filter(b => b.prediction.riskLevel === 'High').length;
-  // Simple score calculation: 100 minus 10 points for every high-risk batch
-  const farmerScore = totalBatches > 0 ? Math.max(0, 100 - highRiskBatches * 10) : 100;
 
 
   // --- Dashboard Components ---
 
-  const StatCard = ({ titleEn, titleBn, value, icon: Icon, className }: { titleEn: string, titleBn: string, value: string | number, icon: React.ElementType, className?: string }) => (
+  const StatCard = ({ titleEn, titleBn, value, icon: Icon, className, isScoreCard = false }: { titleEn: string, titleBn: string, value: string | number, icon: React.ElementType, className?: string, isScoreCard?: boolean }) => (
     <Card className={cn("flex flex-col justify-between p-4 bg-white/10 border border-white/20 backdrop-blur-sm", className)}>
       <div className="opacity-90">
         <p className="text-xs font-normal text-white text-center">
@@ -69,6 +69,7 @@ const FarmerDashboard = () => {
         <p className="text-xl font-bold text-white text-center">
           {value}
         </p>
+        {isScoreCard && <BadgeDisplay />}
       </div>
     </Card>
   );
@@ -221,9 +222,10 @@ const FarmerDashboard = () => {
               <StatCard 
                 titleEn="Score" 
                 titleBn="স্কোর" 
-                value={farmerScore} 
+                value={totalScore} 
                 icon={Ruler} 
                 className="rounded-2xl"
+                isScoreCard={true}
               />
             </div>
           </div>

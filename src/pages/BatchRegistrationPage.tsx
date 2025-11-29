@@ -7,6 +7,7 @@ import { ArrowLeft, Wheat } from 'lucide-react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBatch } from '@/contexts/BatchContext';
+import { useSession } from '@/contexts/SessionContext'; // Import useSession
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -20,6 +21,7 @@ const BatchRegistrationPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { addBatch, batches } = useBatch(); // Get batches here to check length
+  const { updateScore } = useSession(); // Get updateScore
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [submittedData, setSubmittedData] = useState<BatchFormValues | null>(null);
   const [showFirstBatchModal, setShowFirstBatchModal] = useState(false);
@@ -53,6 +55,9 @@ const BatchRegistrationPage = () => {
     
     // Save the batch immediately upon prediction generation
     addBatch(data, result);
+    
+    // Add score for new batch
+    updateScore(100);
     
     // Set state to display the prediction card (ETCL)
     setPrediction(result);
