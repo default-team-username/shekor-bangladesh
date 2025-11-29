@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Map, Shield, ZoomIn, ZoomOut } from 'lucide-react';
+import { ArrowLeft, MapPin, Map, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import BottomNavBar from '@/components/layout/BottomNavBar';
+import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 
 const MapPage = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const MapPage = () => {
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
   
   const userDistrict = user?.user_metadata?.district || 'Dhaka';
+  const mapCenter: [number, number] = [23.8103, 90.4125]; // Dhaka coordinates
 
   // Risk indicator data
   const riskIndicators = [
@@ -103,77 +105,14 @@ const MapPage = () => {
 
         {/* Map Visualization */}
         <Card className="w-full border-border shadow-lg rounded-2xl overflow-hidden">
-          <CardContent className="p-0 relative h-96 bg-gray-200">
-            {/* Map Placeholder with Grid Pattern */}
-            <div className="absolute inset-0 bg-gray-300">
-              {/* Grid lines */}
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,gray_1px,transparent_1px),linear-gradient(to_bottom,gray_1px,transparent_1px)] bg-[size:20px_20px] opacity-20"></div>
-              
-              {/* Farmer locations with different risk levels */}
-              {/* Low Risk Farmers (Green) */}
-              <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-1/3 left-2/3 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-2/3 left-1/3 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-3/4 left-3/4 w-6 h-6 bg-green-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              
-              {/* Moderate Risk Farmers (Yellow) */}
-              <div className="absolute top-1/2 left-1/2 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-1/4 left-3/4 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-3/4 left-1/4 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-2/3 left-2/3 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-1/3 left-1/5 w-6 h-6 bg-yellow-500 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              
-              {/* High Risk Farmers (Red) */}
-              <div className="absolute top-1/2 left-1/3 w-6 h-6 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-2/3 left-1/2 w-6 h-6 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              <div className="absolute top-1/4 left-1/2 w-6 h-6 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white text-xs font-bold">🌾</span>
-              </div>
-              
-              {/* User Location (Blue Pin) */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div className="w-12 h-12 bg-blue-600 border-4 border-white rounded-full flex items-center justify-center shadow-lg rotate-45">
-                  <MapPin className="h-6 w-6 text-white -rotate-45" />
-                </div>
-              </div>
-            </div>
-            
-            {/* Zoom Controls */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2">
-              <Button size="icon" variant="secondary" className="h-8 w-8 rounded shadow">
-                <ZoomIn className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="secondary" className="h-8 w-8 rounded shadow">
-                <ZoomOut className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            {/* Map Attribution */}
-            <div className="absolute bottom-2 right-2 bg-white/80 px-2 py-1 rounded text-xs text-gray-600">
-              © {getTranslation("OpenStreetMap contributors", "ওপেনস্ট্রিটম্যাপ অবদানকারী")}
-            </div>
+          <CardContent className="p-0 relative h-96">
+            <MapContainer center={mapCenter} zoom={10} scrollWheelZoom={true} className="h-full w-full" zoomControl={false}>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <ZoomControl position="topleft" />
+            </MapContainer>
           </CardContent>
         </Card>
 
