@@ -87,7 +87,7 @@ const VoicePage = () => {
 
       // 6. ElevenLabs TTS
       try {
-        // elevenLabsTts now returns a Blob
+        // elevenLabsTts returns a Blob (simulating the backend response)
         const audioDataBlob = await elevenLabsTts(aiAnswer);
         
         // Create URL from Blob
@@ -101,18 +101,18 @@ const VoicePage = () => {
           
           audioRef.current.src = audioUrl;
           
-          // Attempt to play audio (requires user gesture, which is satisfied by the button click initiating this flow)
+          // Attempt to play audio (This is the user gesture point)
           await audioRef.current.play(); 
         }
         toast.success(getTranslation('Answer spoken!', 'উত্তর বলা হয়েছে!'), { id: loadingToastId });
       } catch (ttsError) {
         console.error("TTS playback failed:", ttsError);
-        // 3. Error Handling: TTS failure
+        // Display the required Bangla error message if playback fails
         toast.warning(getTranslation(
           'TTS failed, showing text only.', 
           'দুঃখিত, এখন আমি আপনার জন্য কথা বলতে পারছি না। আবার চেষ্টা করুন।'
         ), { id: loadingToastId });
-        // Ensure audioUrl is undefined if playback failed, so we don't try to replay a broken source
+        // Ensure audioUrl is undefined if playback failed
         audioUrl = undefined; 
       }
 
