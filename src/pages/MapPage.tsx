@@ -215,7 +215,7 @@ const MapPage = () => {
         </div>
 
         {/* Map Container */}
-        <Card className="overflow-hidden border-2 border-gray-300 shadow-lg relative">
+        <Card className="overflow-hidden border-2 border-gray-300 shadow-lg relative z-0">
           <div ref={mapContainerRef} style={{ height: '450px', width: '100%' }} />
           {!isMapReady && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm">
