@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useBatch } from '@/contexts/BatchContext';
 import { useWeather } from '@/hooks/useWeather';
@@ -13,13 +13,21 @@ const Alerts: React.FC = () => {
   const { forecast, isLoading: isWeatherLoading } = useWeather();
   const { language } = useLanguage();
   const { addNotification } = useNotification();
+  
+  // Ref to track if the initial alert for this session/mount has been shown
+  const hasInitialAlertRun = useRef(false); 
 
   useEffect(() => {
     // Conditions to generate an alert:
     // 1. Batches and weather data have loaded.
     // 2. The user has at least one batch registered.
     // 3. There is a forecast available for tomorrow.
-    if (!isWeatherLoading && batches.length > 0 && forecast.length > 1) {
+    // 4. The initial alert for this component mount has NOT run yet.
+    if (!isWeatherLoading && batches.length > 0 && forecast.length > 1 && !hasInitialAlertRun.current) {
+      
+      // Mark as run immediately to prevent re-execution on subsequent renders
+      hasInitialAlertRun.current = true; 
+      
       const tomorrowWeather = forecast[1]; // Index 1 is tomorrow's forecast
 
       // A self-invoking async function to call the Gemini utility
