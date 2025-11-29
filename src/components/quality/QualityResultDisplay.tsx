@@ -44,6 +44,10 @@ const QualityResultDisplay: React.FC<QualityResultDisplayProps> = ({ result, cro
   
   const isFresh = result.status === 'Fresh';
 
+  // New descriptive text
+  const aiDescriptionEn = "AI instantly identifies the threat, assesses the risk, and generates a hyper-local, grounded, and specific treatment plan entirely in Bangla.";
+  const aiDescriptionBn = "এআই তাৎক্ষণিকভাবে হুমকি শনাক্ত করে, ঝুঁকি মূল্যায়ন করে এবং সম্পূর্ণ বাংলায় একটি হাইপার-লোকাল, বাস্তবসম্মত ও নির্দিষ্ট প্রতিকার পরিকল্পনা তৈরি করে।";
+
   return (
     <div className="w-full space-y-6">
       {/* --- 1. Quality Result Card --- */}
@@ -76,6 +80,13 @@ const QualityResultDisplay: React.FC<QualityResultDisplayProps> = ({ result, cro
             <Gauge className="h-4 w-4" />
             {getTranslation("Confidence:", "আত্মবিশ্বাস:")}
             <span className={cn("font-bold", iconColorClass)}>{result.confidence}%</span>
+          </div>
+
+          {/* AI Description Block */}
+          <div className="mt-6 w-full p-3 bg-secondary rounded-xl text-center border border-border/50">
+            <p className="text-sm font-medium text-foreground">
+              {getTranslation(aiDescriptionEn, aiDescriptionBn)}
+            </p>
           </div>
 
           {/* Guidance Box */}
