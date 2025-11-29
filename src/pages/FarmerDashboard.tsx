@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBatch, StoredBatch } from '@/contexts/BatchContext';
 import { format } from 'date-fns';
 import { cropTypes } from '@/data/batchData';
+import BottomNavBar from '@/components/layout/BottomNavBar'; // Import the new component
 
 const FarmerDashboard = () => {
   const { user, isLoading, mockLogout } = useSession();
@@ -17,7 +18,7 @@ const FarmerDashboard = () => {
   const navigate = useNavigate();
   
   // State for animation (Requirement 2)
-  const [isLoaded, setIsLoaded] = React.useState(false);
+  const [isLoaded, setIsLoaded] as React.useState(false);
 
   React.useEffect(() => {
     // Trigger fade-in animation after component mounts
@@ -163,7 +164,7 @@ const FarmerDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Main Container */}
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center pb-20 md:pb-0"> {/* Added pb-20 for bottom nav bar clearance */}
         
         {/* Top Header Section (Green Background) */}
         <div className="w-full bg-primary shadow-lg rounded-b-3xl p-4 pb-8">
@@ -253,6 +254,9 @@ const FarmerDashboard = () => {
 
         </div>
       </div>
+      
+      {/* Bottom Navigation Bar (Mobile Only) */}
+      <BottomNavBar />
     </div>
   );
 };
