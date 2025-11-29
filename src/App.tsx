@@ -15,7 +15,8 @@ import BatchRegistrationPage from "./pages/BatchRegistrationPage";
 import BatchDetailsPage from "./pages/BatchDetailsPage";
 import WeatherPage from "./pages/WeatherPage";
 import MapPage from "./pages/MapPage";
-import VoicePage from "./pages/VoicePage"; // Import new VoicePage
+import VoicePage from "./pages/VoicePage";
+import QualityEvaluationPage from "./pages/QualityEvaluationPage"; // Import new QualityEvaluationPage
 
 const queryClient = new QueryClient();
 
@@ -37,7 +38,8 @@ const App = () => (
                 <Route path="/dashboard/batch/:id" element={<BatchDetailsPage />} />
                 <Route path="/dashboard/weather" element={<WeatherPage />} />
                 <Route path="/dashboard/map" element={<MapPage />} />
-                <Route path="/dashboard/voice" element={<VoicePage />} /> {/* New Voice Route */}
+                <Route path="/dashboard/voice" element={<VoicePage />} />
+                <Route path="/dashboard/quality-scan" element={<QualityEvaluationPage />} /> {/* New Quality Scan Route */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
