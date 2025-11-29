@@ -2,7 +2,7 @@ import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { WorkflowSection } from "@/components/landing/WorkflowSection";
-import { FactsSection } from "@/components/landing/FactsSection";
+import { InteractiveInfoSection } from "@/components/landing/InteractiveInfoSection";
 import { Footer } from "@/components/landing/Footer";
 
 const Landing = () => {
@@ -13,7 +13,7 @@ const Landing = () => {
         <HeroSection />
         <ProblemSection />
         <WorkflowSection />
-        <FactsSection />
+        <InteractiveInfoSection />
       </main>
       <Footer />
     </div>
